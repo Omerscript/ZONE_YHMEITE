@@ -219,7 +219,7 @@
   .modal-back.show{display:grid}
   .modal{background:var(--panel);border:1px solid var(--border);border-radius:16px;
     max-width:520px;width:100%;padding:26px;box-shadow:var(--shadow);
-    max-height:90vh;overflow-y:auto}
+    max-height:90vh;overflow-y:auto;display:flex;flex-direction:column}
   .modal h3{margin-bottom:8px}
   .modal p{color:var(--muted);font-size:14px;margin-bottom:20px;line-height:1.7}
   .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap}
@@ -246,13 +246,16 @@
   .phrase-box button{background:var(--panel-2);color:var(--text);border:1px solid var(--border);
     border-radius:8px;padding:6px 12px;font-size:12px}
   .phrase-box button:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+  /* ===== Dialogs (explore) ===== */
   .dialog-item{display:flex;align-items:center;gap:12px;padding:12px;
     border-radius:10px;background:var(--bg-2);border:1px solid var(--border);
     cursor:pointer;transition:.2s;margin-bottom:8px}
   .dialog-item:hover{border-color:var(--accent);background:#1a2336}
   .dialog-item .d-avatar{width:44px;height:44px;border-radius:50%;flex-shrink:0;
     background:linear-gradient(135deg,var(--accent),#7c3aed);display:grid;
-    place-items:center;font-weight:700;color:#fff;font-size:16px}
+    place-items:center;font-weight:700;color:#fff;font-size:16px;overflow:hidden;
+    position:relative}
+  .dialog-item .d-avatar img{width:100%;height:100%;object-fit:cover;display:block}
   .dialog-item .d-info{flex:1;min-width:0}
   .dialog-item .d-info b{display:block;font-size:14px;margin-bottom:2px;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -260,18 +263,34 @@
     display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .dialog-item .d-meta{text-align:left;flex-shrink:0}
   .dialog-item .d-meta small{color:var(--muted);font-size:11px;display:block}
+  /* ===== Messages ===== */
   .msg-bubble{display:flex;gap:10px;margin-bottom:14px;padding:10px;
     background:var(--bg-2);border-radius:12px;border:1px solid var(--border)}
   .msg-bubble.out{background:rgba(59,130,246,.08);border-color:rgba(59,130,246,.25)}
   .msg-bubble .m-avatar{width:36px;height:36px;border-radius:50%;flex-shrink:0;
     background:linear-gradient(135deg,#7c3aed,var(--accent));display:grid;
-    place-items:center;font-weight:700;color:#fff;font-size:13px}
+    place-items:center;font-weight:700;color:#fff;font-size:13px;overflow:hidden;position:relative}
+  .msg-bubble .m-avatar img{width:100%;height:100%;object-fit:cover;display:block}
   .msg-bubble .m-body{flex:1;min-width:0}
   .msg-bubble .m-head{display:flex;justify-content:space-between;
     align-items:center;margin-bottom:4px;gap:8px}
   .msg-bubble .m-head b{font-size:13px}
   .msg-bubble .m-head small{color:var(--muted);font-size:11px}
   .msg-bubble .m-text{font-size:14px;line-height:1.6;word-wrap:break-word;white-space:pre-wrap}
+  /* ===== Chat composer ===== */
+  .chat-composer{display:flex;gap:8px;margin-top:12px;padding-top:12px;
+    border-top:1px solid var(--border);align-items:flex-end}
+  .chat-composer textarea{flex:1;min-height:44px;max-height:120px;resize:none;
+    padding:10px 14px;border-radius:12px;background:var(--bg-2);
+    border:1px solid var(--border);color:var(--text);font-size:14px;font-family:inherit;
+    transition:.2s}
+  .chat-composer textarea:focus{border-color:var(--accent);
+    box-shadow:0 0 0 3px var(--accent-glow);outline:none}
+  .chat-composer button{padding:10px 16px;border-radius:12px;font-size:14px;font-weight:700;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;
+    box-shadow:0 6px 20px var(--accent-glow);transition:.2s;display:flex;align-items:center;gap:6px}
+  .chat-composer button:hover{transform:translateY(-1px)}
+  .chat-composer button:disabled{opacity:.5;cursor:not-allowed;transform:none}
   .filter-row{display:flex;align-items:center;justify-content:space-between;
     gap:14px;padding:14px;background:var(--bg-2);border-radius:10px;
     border:1px solid var(--border);margin-bottom:8px}
@@ -295,6 +314,8 @@
     background:var(--bg-2);border:1px solid var(--border)}
   .conn-status .dot{width:8px;height:8px;border-radius:50%;background:var(--green)}
   .conn-status.off .dot{background:var(--red)}
+  .chat-view{display:flex;flex-direction:column;min-height:0;flex:1}
+  .chat-messages{max-height:52vh;overflow-y:auto;padding:4px 2px}
   @media(max-width:860px){
     .hero{grid-template-columns:1fr;padding:40px 20px}
     .hero-visual{height:260px;order:-1}
@@ -351,8 +372,8 @@
       <div class="card"><div class="ico">🤖</div><h3>بوت تفاعلي</h3><p>البوت يرد عليك فوراً ويرشدك خلال التسجيل والتحقق.</p></div>
       <div class="card"><div class="ico">🔔</div><h3>تنبيهات فورية</h3><p>استلم أكواد التحقق والرسائل الجديدة عبر بوت تلغرام لحظة وصولها.</p></div>
       <div class="card"><div class="ico">💬</div><h3>استكشاف المحادثات</h3><p>تصفح محادثات أي حساب ورسائله من داخل المنصة.</p></div>
+      <div class="card"><div class="ico">✉️</div><h3>إرسال الرسائل</h3><p>أرسل رسائل نصية مباشرة من الحساب الوهمي لأي محادثة.</p></div>
       <div class="card"><div class="ico">🛡️</div><h3>حذف آمن بـ 3 خطوات</h3><p>تأكيد مطوّل + كلمة سرية عبر البوت — لا حذف بالخطأ.</p></div>
-      <div class="card"><div class="ico">📊</div><h3>معلومات البروفايل</h3><p>يستورد اسمك وصورتك من تلغرام تلقائياً.</p></div>
     </div>
   </div>
 </section>
@@ -385,24 +406,18 @@
 
 <script>
 /* =====================================================
-   API BASE — كشف تلقائي محسّن
+   API BASE — كشف تلقائي
 ===================================================== */
 const TUNNEL_BASE_URL = "https://pedigree-hankering-unmixable.ngrok-free.dev/t/cn9dlopge5";
 
 const API_BASE = (function(){
   const path = window.location.pathname;
   const host = window.location.hostname;
-
-  // 1) عبر نفق ZONE Tunnel — نستخدم نفس النطاق
   const m = path.match(/^\/t\/[^\/]+/);
   if (m) return window.location.origin + m[0];
-
-  // 2) GitHub Pages أو localhost — نستخدم رابط النفق
   if (host.endsWith("github.io") || host === "localhost" || host === "127.0.0.1") {
     return TUNNEL_BASE_URL;
   }
-
-  // 3) أي حالة أخرى — نستخدم رابط النفق
   return TUNNEL_BASE_URL;
 })();
 
@@ -414,13 +429,11 @@ let ACCOUNTS_CACHE = [];
 let alertPollTimer = null;
 let unreadCount = 0;
 
-/* =====================================================
-   ✅ api() — الإصلاح الحرج: ngrok-skip-browser-warning + قراءة text
-===================================================== */
+/* ============ api() ============ */
 async function api(path, opts = {}) {
   const headers = {
     "Content-Type": "application/json",
-    "ngrok-skip-browser-warning": "true",   // ← يمنع صفحة تحذير ngrok
+    "ngrok-skip-browser-warning": "true",
     ...(opts.headers || {})
   };
   if (TOKEN) headers["Authorization"] = "Bearer " + TOKEN;
@@ -432,7 +445,6 @@ async function api(path, opts = {}) {
     console.error("[fetch error]", url, err);
     throw new Error("تعذّر الاتصال بالخادم — تحقق من رابط النفق");
   }
-  // اقرأ النص أولاً للتشخيص
   const text = await res.text();
   let data = {};
   try {
@@ -1127,7 +1139,6 @@ function cancelManualStage() {
   renderAddTab();
 }
 
-/* ✅ رفع ملف الجلسة — مع ngrok header + قراءة text */
 async function uploadSessionFile() {
   const input = $("sessionFile");
   const label = ($("fileLabel").value || "").trim();
@@ -1144,7 +1155,7 @@ async function uploadSessionFile() {
       method: "POST",
       headers: {
         "Authorization": "Bearer " + TOKEN,
-        "ngrok-skip-browser-warning": "true"   // ← الإصلاح
+        "ngrok-skip-browser-warning": "true"
       },
       body: fd
     });
@@ -1223,12 +1234,11 @@ async function addStringSession() {
   }
 }
 
-/* ✅ منع double-render + تحديث القائمة */
 async function onAccountAdded(res) {
   closeModal();
   showToast("تمت إضافة الحساب: " + (res.label || res.phone), "green");
   await refreshAccounts();
-  await navigate("accounts");   // ← بدل renderAccounts مباشرة
+  await navigate("accounts");
 }
 
 async function toggleNotify(id) {
@@ -1250,13 +1260,12 @@ async function checkAccount(id) {
   } catch (e) { showToast(e.message, "red"); }
 }
 
-/* ✅ تحميل الجلسة — مع ngrok header */
 async function downloadSession(id) {
   try {
     const res = await fetch(API_BASE + `/accounts/${id}/download-session`, {
       headers: {
         "Authorization": "Bearer " + TOKEN,
-        "ngrok-skip-browser-warning": "true"   // ← الإصلاح
+        "ngrok-skip-browser-warning": "true"
       }
     });
     if (!res.ok) {
@@ -1272,6 +1281,7 @@ async function downloadSession(id) {
   } catch (e) { showToast(e.message, "red"); }
 }
 
+/* ===== Delete flow ===== */
 let holdTimer = null, holdStart = 0, currentDeleteId = null;
 
 async function startDelete(id) {
@@ -1361,6 +1371,18 @@ function cancelDelete() {
   closeModal(); currentDeleteId = null;
 }
 
+/* ============================================================
+   Explore: dialogs + messages + send
+============================================================ */
+let chatState = { accId: null, peerId: null, peerName: "", peerAvatar: "", peerIcon: "" };
+
+function avatarOrFallback(avatar, name, className) {
+  if (avatar) {
+    return `<img src="${escapeHtml(avatar)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span style="display:none;width:100%;height:100%;place-items:center">${escapeHtml((name || "?").slice(0,1).toUpperCase())}</span>`;
+  }
+  return escapeHtml((name || "?").slice(0,1).toUpperCase());
+}
+
 async function exploreAccount(id) {
   const acc = ACCOUNTS_CACHE.find(a => a.id === id);
   if (!acc) return;
@@ -1368,61 +1390,136 @@ async function exploreAccount(id) {
     <h3>🔍 ${escapeHtml(acc.label || acc.phone)}</h3>
     <p style="margin-bottom:16px;direction:ltr;text-align:left;color:var(--muted)">${escapeHtml(acc.phone)}</p>
     <div id="exploreBody">
-      <div style="text-align:center;padding:30px;color:var(--muted)"><span class="spinner"></span> جاري...</div>
+      <div style="text-align:center;padding:30px;color:var(--muted)"><span class="spinner"></span> جاري تحميل المحادثات والصور...</div>
     </div>
     <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">إغلاق</button></div>
   `);
   try {
-    const dialogs = await api(`/accounts/${id}/dialogs?limit=30`);
+    const dialogs = await api(`/accounts/${id}/dialogs?limit=30&avatars=1`);
     const body = $("exploreBody");
-    if (!dialogs.length) { body.innerHTML = '<div class="empty"><div class="big">💬</div><h3>لا محادثات</h3></div>'; return; }
+    if (!dialogs.length) {
+      body.innerHTML = '<div class="empty"><div class="big">💬</div><h3>لا محادثات</h3></div>';
+      return;
+    }
     body.innerHTML = dialogs.map(d => {
       const icon = d.is_user ? "👤" : d.is_group ? "👥" : "📢";
-      const init = escapeHtml((d.name || "?").slice(0, 1).toUpperCase());
-      return `<div class="dialog-item" data-acc="${id}" data-peer="${d.id}" data-name="${escapeHtml(d.name)}" data-icon="${icon}">
-          <div class="d-avatar">${init}</div>
+      const initial = escapeHtml((d.name || "?").slice(0, 1).toUpperCase());
+      const avatarHTML = d.avatar
+        ? `<img src="${escapeHtml(d.avatar)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span style="display:none;place-items:center;width:100%;height:100%">${initial}</span>`
+        : initial;
+      return `<div class="dialog-item" data-acc="${id}" data-peer="${d.id}" data-name="${escapeHtml(d.name)}" data-icon="${icon}" data-avatar="${escapeHtml(d.avatar || '')}">
+          <div class="d-avatar">${avatarHTML}</div>
           <div class="d-info"><b>${icon} ${escapeHtml(d.name)}</b><small>${escapeHtml(d.last_text || "(بدون نص)")}</small></div>
           <div class="d-meta"><small>${escapeHtml(d.date || "")}</small>${d.unread ? `<span class="pill red">${d.unread}</span>` : ""}</div>
         </div>`;
     }).join("");
     body.querySelectorAll(".dialog-item").forEach(it => {
-      it.addEventListener("click", () => openDialog(parseInt(it.dataset.acc), parseInt(it.dataset.peer), it.dataset.name, it.dataset.icon));
+      it.addEventListener("click", () => openDialog(
+        parseInt(it.dataset.acc),
+        parseInt(it.dataset.peer),
+        it.dataset.name,
+        it.dataset.icon,
+        it.dataset.avatar || ""
+      ));
     });
   } catch (e) {
     $("exploreBody").innerHTML = `<p style="color:#fca5a5">❌ ${escapeHtml(e.message)}</p>`;
   }
 }
 
-async function openDialog(accId, peerId, name, icon) {
+async function openDialog(accId, peerId, name, icon, avatar) {
+  chatState = { accId, peerId, peerName: name, peerAvatar: avatar || "", peerIcon: icon || "" };
+  const initial = escapeHtml((name || "?").slice(0,1).toUpperCase());
+  const headerAvatar = avatar
+    ? `<img src="${escapeHtml(avatar)}" style="width:36px;height:36px;border-radius:50%;object-fit:cover" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span style="display:none;width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#7c3aed);place-items:center;font-weight:700;color:#fff;font-size:14px">${initial}</span>`
+    : `<span style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#7c3aed);display:grid;place-items:center;font-weight:700;color:#fff;font-size:14px">${initial}</span>`;
+
   openModal(`
-    <h3>${icon} ${escapeHtml(name)}</h3>
-    <div id="msgsBody" style="max-height:50vh;overflow-y:auto;margin-top:12px">
-      <div style="text-align:center;padding:30px;color:var(--muted)"><span class="spinner"></span> جاري...</div>
+    <h3 style="display:flex;align-items:center;gap:10px;margin-bottom:8px">${headerAvatar}<span>${icon || ""} ${escapeHtml(name)}</span></h3>
+    <div class="chat-view">
+      <div id="msgsBody" class="chat-messages">
+        <div style="text-align:center;padding:30px;color:var(--muted)"><span class="spinner"></span> جاري...</div>
+      </div>
+      <div class="chat-composer">
+        <textarea id="msgInput" placeholder="اكتب رسالة..." rows="1"></textarea>
+        <button id="sendBtn" onclick="sendMessageNow()">📤 إرسال</button>
+      </div>
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="exploreAccount(${accId})">🔙 رجوع</button>
       <button class="btn btn-ghost" onclick="closeModal()">إغلاق</button>
     </div>
   `);
+  const ta = $("msgInput");
+  if (ta) {
+    ta.addEventListener("keydown", e => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessageNow();
+      }
+    });
+  }
+  await loadMessages();
+}
+
+async function loadMessages() {
+  if (!chatState.accId || !chatState.peerId) return;
   try {
-    const msgs = await api(`/accounts/${accId}/dialogs/${peerId}/messages?limit=30`);
+    const msgs = await api(`/accounts/${chatState.accId}/dialogs/${chatState.peerId}/messages?limit=30`);
     const body = $("msgsBody");
-    if (!msgs.length) { body.innerHTML = '<div class="empty"><div class="big">💬</div><h3>لا رسائل</h3></div>'; return; }
+    if (!body) return;
+    if (!msgs.length) {
+      body.innerHTML = '<div class="empty"><div class="big">💬</div><h3>لا رسائل</h3></div>';
+      return;
+    }
     body.innerHTML = msgs.map(m => {
       const who = m.out ? "أنا" : (m.sender_name || "—");
-      const init = escapeHtml(who.slice(0, 1).toUpperCase() || "?");
+      const initial = escapeHtml(who.slice(0, 1).toUpperCase() || "?");
+      const avatarHTML = m.avatar
+        ? `<img src="${escapeHtml(m.avatar)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span style="display:none;place-items:center;width:100%;height:100%">${initial}</span>`
+        : initial;
       return `<div class="msg-bubble ${m.out ? "out" : ""}">
-          <div class="m-avatar">${init}</div>
+          <div class="m-avatar">${avatarHTML}</div>
           <div class="m-body"><div class="m-head"><b>${escapeHtml(who)}</b><small>${escapeHtml(m.date || "")}</small></div>
           <div class="m-text">${escapeHtml(m.text || "(بدون نص)")}</div></div>
         </div>`;
     }).join("");
     body.scrollTop = body.scrollHeight;
   } catch (e) {
-    $("msgsBody").innerHTML = `<p style="color:#fca5a5">❌ ${escapeHtml(e.message)}</p>`;
+    const body = $("msgsBody");
+    if (body) body.innerHTML = `<p style="color:#fca5a5">❌ ${escapeHtml(e.message)}</p>`;
   }
 }
 
+async function sendMessageNow() {
+  const ta = $("msgInput");
+  const btn = $("sendBtn");
+  if (!ta || !btn) return;
+  const text = (ta.value || "").trim();
+  if (!text) return;
+  if (!chatState.accId || !chatState.peerId) { showToast("لا محادثة مفتوحة", "red"); return; }
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>';
+  ta.disabled = true;
+  try {
+    await api(`/accounts/${chatState.accId}/dialogs/${chatState.peerId}/send`, {
+      method: "POST",
+      body: JSON.stringify({ text })
+    });
+    ta.value = "";
+    await loadMessages();
+    showToast("تم إرسال الرسالة", "green");
+  } catch (e) {
+    showToast(e.message, "red");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = "📤 إرسال";
+    ta.disabled = false;
+    ta.focus();
+  }
+}
+
+/* ===== Alerts ===== */
 async function renderAlerts(main) {
   let alerts = [];
   try { alerts = await api("/alerts?limit=100"); } catch (e) {}
