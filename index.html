@@ -384,12 +384,31 @@
 </div>
 
 <script>
+/* =====================================================
+   API BASE — كشف تلقائي
+   - إذا فُتحت الصفحة عبر نفق ZONE Tunnel (/t/{slug}/...) → نستخدم نفس النطاق.
+   - إذا فُتحت من GitHub Pages → نستخدم رابط النفق الثابت (غيّره إن لزم).
+===================================================== */
+const TUNNEL_BASE_URL = "https://pedigree-hankering-unmixable.ngrok-free.dev/t/cn9dlopge5";
+
 const API_BASE = (function(){
-  const p = window.location.pathname;
-  const m = p.match(/^\/t\/[^\/]+/);
+  const path = window.location.pathname;
+  const host = window.location.hostname;
+
+  // 1) عبر نفق ZONE Tunnel — نستخدم نفس النطاق
+  const m = path.match(/^\/t\/[^\/]+/);
   if (m) return window.location.origin + m[0];
-  return window.location.origin;
+
+  // 2) GitHub Pages أو أي نطاق ثابت — نستخدم رابط النفق
+  if (host.endsWith("github.io") || host === "localhost" || host === "127.0.0.1") {
+    return TUNNEL_BASE_URL;
+  }
+
+  // 3) أي حالة أخرى (مثل تشغيل index.html مباشرة) — نستخدم رابط النفق
+  return TUNNEL_BASE_URL;
 })();
+
+console.log("[وهمياتي] API_BASE =", API_BASE);
 
 let TOKEN = localStorage.getItem("thm_token") || "";
 let CURRENT_USER = null;
@@ -400,11 +419,18 @@ let unreadCount = 0;
 async function api(path, opts = {}) {
   const headers = { "Content-Type": "application/json", ...(opts.headers || {}) };
   if (TOKEN) headers["Authorization"] = "Bearer " + TOKEN;
-  const res = await fetch(API_BASE + path, { ...opts, headers });
+  const url = API_BASE + path;
+  let res;
+  try {
+    res = await fetch(url, { ...opts, headers, mode: "cors" });
+  } catch (err) {
+    console.error("[fetch error]", url, err);
+    throw new Error("تعذّر الاتصال بالخادم — تحقق من الرابط");
+  }
   let data = {};
   try { data = await res.json(); } catch (e) {}
   if (!res.ok) {
-    const msg = data.detail || data.error || "خطأ في الخادم";
+    const msg = data.detail || data.error || `خطأ ${res.status}`;
     throw new Error(msg);
   }
   return data;
@@ -629,7 +655,6 @@ async function submitTgUsername() {
   goStep("sendCode");
 }
 
-let verifyTimer = null;
 async function pollVerifyOtp() {
   if (authState.step !== "sendCode") return;
   try {
@@ -641,7 +666,6 @@ async function pollVerifyOtp() {
     authState.avatar = res.avatar;
     goStep("setPassword");
   } catch (e) {
-    // continue polling
     const w = $("waitingText");
     if (w) w.innerHTML = `<span class="spinner"></span> ${escapeHtml(e.message || "في انتظار التحقق...")}`;
     setTimeout(pollVerifyOtp, 3000);
@@ -1090,8 +1114,6 @@ function cancelManualStage() {
   manualLoginState = { stage: "phone", phone: "" };
   renderAddTab();
 }
-
-let pendingSessionData = null;
 
 async function uploadSessionFile() {
   const input = $("sessionFile");
