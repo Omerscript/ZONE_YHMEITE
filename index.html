@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>وهمياتي — منصة إدارة حسابات تلغرام</title>
+<style>
+  :root{
+    --bg:#0a0e17;--bg-2:#111827;--panel:#151c2c;--panel-2:#1b2437;
+    --border:#243047;--text:#e6edf7;--muted:#8b98ad;
+    --accent:#3b82f6;--accent-2:#2563eb;--accent-glow:rgba(59,130,246,.35);
+    --green:#22c55e;--red:#ef4444;--yellow:#f59e0b;
+    --radius:14px;--shadow:0 10px 40px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:'Segoe UI',Tahoma,system-ui,sans-serif;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(59,130,246,.18), transparent 60%),
+      radial-gradient(900px 500px at 0% 100%, rgba(37,99,235,.12), transparent 60%),
+      var(--bg);
+    color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+  button{font-family:inherit;cursor:pointer;border:none;outline:none}
+  input,select,textarea{font-family:inherit}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-track{background:var(--bg-2)}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;
+    padding:16px 28px;border-bottom:1px solid var(--border);
+    background:rgba(10,14,23,.7);backdrop-filter:blur(12px);position:sticky;top:0;z-index:50}
+  .brand{display:flex;align-items:center;gap:12px;font-weight:700;font-size:20px}
+  .brand .logo{width:38px;height:38px;border-radius:11px;
+    background:linear-gradient(135deg,var(--accent),#7c3aed);display:grid;place-items:center;
+    font-size:18px;box-shadow:0 0 22px var(--accent-glow)}
+  .brand small{display:block;font-weight:400;font-size:11px;color:var(--muted)}
+  .top-actions{display:flex;gap:10px;align-items:center}
+  .btn{padding:10px 18px;border-radius:10px;font-size:14px;font-weight:600;
+    transition:.2s;display:inline-flex;align-items:center;gap:8px;justify-content:center}
+  .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;
+    box-shadow:0 6px 20px var(--accent-glow)}
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 28px var(--accent-glow)}
+  .btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
+  .btn-ghost:hover{background:var(--panel-2)}
+  .btn-danger{background:rgba(239,68,68,.12);color:#fca5a5;border:1px solid rgba(239,68,68,.3)}
+  .btn-danger:hover{background:rgba(239,68,68,.2)}
+  .btn-green{background:rgba(34,197,94,.15);color:#86efac;border:1px solid rgba(34,197,94,.3)}
+  .btn-green:hover{background:rgba(34,197,94,.25)}
+  .btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+  .landing{flex:1;display:none;flex-direction:column}
+  .landing.active{display:flex}
+  .hero{flex:1;display:grid;grid-template-columns:1.1fr 1fr;gap:40px;
+    align-items:center;padding:60px 6vw;max-width:1400px;margin:0 auto;width:100%}
+  .hero h1{font-size:clamp(28px,4vw,52px);line-height:1.2;margin-bottom:18px}
+  .hero h1 span{background:linear-gradient(135deg,#60a5fa,#a78bfa);
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{color:var(--muted);font-size:17px;line-height:1.9;margin-bottom:28px;max-width:540px}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+  .hero-visual{position:relative;height:380px;border-radius:22px;
+    background:linear-gradient(160deg,var(--panel),var(--bg-2));
+    border:1px solid var(--border);box-shadow:var(--shadow);
+    overflow:hidden;display:grid;place-items:center}
+  .hero-visual .glass{position:relative;z-index:1;width:78%;height:70%;
+    background:rgba(21,28,44,.9);border:1px solid var(--border);border-radius:16px;
+    padding:22px;backdrop-filter:blur(8px);display:flex;flex-direction:column;gap:14px}
+  .skeleton{height:12px;border-radius:6px;
+    background:linear-gradient(90deg,var(--border),#2c3a56,var(--border));
+    background-size:200% 100%;animation:shimmer 2.2s linear infinite}
+  @keyframes shimmer{to{background-position:-200% 0}}
+  .sk-row{display:flex;align-items:center;gap:12px}
+  .sk-avatar{width:46px;height:46px;border-radius:50%;
+    background:linear-gradient(135deg,var(--accent),#7c3aed)}
+  .sk-lines{flex:1;display:flex;flex-direction:column;gap:8px}
+  .features{padding:40px 6vw 80px;max-width:1400px;margin:0 auto;width:100%}
+  .features h2{font-size:26px;margin-bottom:6px}
+  .features p.sub{color:var(--muted);margin-bottom:28px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
+    padding:22px;transition:.25s}
+  .card:hover{transform:translateY(-3px);border-color:#31425f;box-shadow:0 12px 30px rgba(0,0,0,.35)}
+  .card .ico{font-size:26px;margin-bottom:12px}
+  .card h3{font-size:16px;margin-bottom:8px}
+  .card p{color:var(--muted);font-size:14px;line-height:1.7}
+  .auth-wrap{flex:1;display:none;place-items:center;padding:40px 20px}
+  .auth-wrap.active{display:grid}
+  .auth-card{width:100%;max-width:440px;background:var(--panel);
+    border:1px solid var(--border);border-radius:18px;padding:34px;
+    box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .auth-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,var(--accent),#7c3aed)}
+  .step-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;
+    color:var(--accent);background:rgba(59,130,246,.12);padding:5px 12px;
+    border-radius:20px;margin-bottom:16px;font-weight:600}
+  .auth-card h2{font-size:23px;margin-bottom:8px}
+  .auth-card .desc{color:var(--muted);font-size:14px;line-height:1.8;margin-bottom:22px}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:13px;font-weight:600;margin-bottom:7px;color:#c4d0e2}
+  .field input,.field textarea{width:100%;padding:13px 15px;border-radius:10px;
+    background:var(--bg-2);border:1px solid var(--border);color:var(--text);font-size:14px;
+    transition:.2s;direction:ltr;text-align:left}
+  .field input:focus,.field textarea:focus{border-color:var(--accent);
+    box-shadow:0 0 0 3px var(--accent-glow);background:#0f1623;outline:none}
+  .field input::placeholder,.field textarea::placeholder{color:#5b6982;direction:rtl;text-align:right}
+  .field textarea{min-height:80px;resize:vertical;font-family:'Consolas',monospace}
+  .hint{font-size:12px;color:var(--muted);margin-top:6px}
+  .error{color:#fca5a5;font-size:13px;margin-top:6px;display:none}
+  .error.show{display:block}
+  .copy-box{display:flex;gap:8px;align-items:stretch;background:var(--bg-2);
+    border:1px dashed var(--border);border-radius:10px;padding:12px;margin:16px 0}
+  .copy-box code{flex:1;color:#93c5fd;font-size:14px;direction:ltr;text-align:left;
+    display:flex;align-items:center;word-break:break-all;font-family:'Consolas',monospace;
+    font-weight:700;letter-spacing:1px}
+  .copy-box button{background:var(--panel-2);color:var(--text);border:1px solid var(--border);
+    border-radius:8px;padding:0 12px;font-size:12px;white-space:nowrap;transition:.2s}
+  .copy-box button:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+  .bot-link{display:flex;align-items:center;justify-content:center;gap:8px;
+    padding:14px;margin:16px 0;background:rgba(59,130,246,.1);
+    border:1px solid rgba(59,130,246,.3);border-radius:12px;color:#93c5fd;
+    font-weight:600;text-decoration:none;transition:.2s;cursor:pointer}
+  .bot-link:hover{background:rgba(59,130,246,.2);border-color:var(--accent)}
+  .waiting{display:flex;align-items:center;justify-content:center;gap:10px;
+    padding:14px;color:var(--muted);font-size:14px}
+  .step-dots{display:flex;gap:6px;justify-content:center;margin-bottom:22px}
+  .step-dots span{width:8px;height:8px;border-radius:50%;background:var(--border);transition:.3s}
+  .step-dots span.active{background:var(--accent);width:22px;border-radius:5px}
+  .step-dots span.done{background:var(--green)}
+  .pw-strength{display:flex;gap:6px;margin-top:8px}
+  .pw-strength i{height:4px;flex:1;background:var(--border);border-radius:3px;transition:.3s}
+  .pw-strength i.ok{background:var(--green)}
+  .pw-strength i.mid{background:var(--yellow)}
+  .pw-strength i.bad{background:var(--red)}
+  .pw-strength-text{font-size:12px;color:var(--muted);margin-top:6px}
+  .divider{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:12px;margin:22px 0}
+  .divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--border)}
+  .success-card{text-align:center;padding:40px 28px}
+  .success-card .big-check{width:76px;height:76px;border-radius:50%;margin:0 auto 20px;
+    background:rgba(34,197,94,.12);border:2px solid var(--green);
+    display:grid;place-items:center;font-size:38px;color:var(--green);
+    animation:pop .5s cubic-bezier(.5,1.8,.5,1)}
+  @keyframes pop{0%{transform:scale(.4);opacity:0}100%{transform:scale(1);opacity:1}}
+  .app{display:none;flex:1;min-height:0}
+  .app.active{display:flex}
+  .sidebar{width:260px;flex-shrink:0;background:var(--panel);border-left:1px solid var(--border);
+    display:flex;flex-direction:column;padding:20px 14px;overflow-y:auto}
+  .profile-mini{display:flex;align-items:center;gap:12px;padding:12px;
+    background:var(--bg-2);border-radius:12px;margin-bottom:20px;border:1px solid var(--border)}
+  .profile-mini img,.profile-mini .avatar-fallback{width:42px;height:42px;border-radius:50%;
+    object-fit:cover;flex-shrink:0;background:linear-gradient(135deg,var(--accent),#7c3aed);
+    display:grid;place-items:center;font-weight:700;font-size:16px;color:#fff}
+  .profile-mini .info{flex:1;min-width:0}
+  .profile-mini .info b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .profile-mini .info small{color:var(--muted);font-size:12px}
+  .nav{display:flex;flex-direction:column;gap:4px;flex:1}
+  .nav-item{display:flex;align-items:center;gap:12px;padding:12px 14px;
+    border-radius:10px;color:var(--muted);font-size:14px;font-weight:500;
+    transition:.2s;cursor:pointer;border:none;background:transparent;width:100%;text-align:right}
+  .nav-item:hover{background:var(--panel-2);color:var(--text)}
+  .nav-item.active{background:rgba(59,130,246,.14);color:#93c5fd;font-weight:600}
+  .nav-item .ico{font-size:17px;width:22px;text-align:center}
+  .nav-item .badge{margin-right:auto;background:var(--red);color:#fff;font-size:11px;
+    padding:1px 7px;border-radius:10px;font-weight:700;min-width:18px;text-align:center}
+  .nav-sep{height:1px;background:var(--border);margin:12px 6px}
+  .main{flex:1;overflow-y:auto;padding:28px 34px}
+  .page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
+    margin-bottom:24px;flex-wrap:wrap}
+  .page-head h1{font-size:24px}
+  .page-head p{color:var(--muted);font-size:14px;margin-top:4px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:24px}
+  .stat{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
+    padding:18px;display:flex;flex-direction:column;gap:6px}
+  .stat .lbl{color:var(--muted);font-size:13px}
+  .stat .val{font-size:26px;font-weight:700}
+  .stat .val.green{color:var(--green)}
+  .stat .val.blue{color:var(--accent)}
+  .stat .val.yellow{color:var(--yellow)}
+  .panel{background:var(--panel);border:1px solid var(--border);
+    border-radius:var(--radius);padding:22px;margin-bottom:18px}
+  .panel h3{font-size:16px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .table{width:100%;border-collapse:collapse;font-size:14px}
+  .table th{text-align:right;color:var(--muted);font-weight:600;font-size:12px;
+    padding:10px 8px;border-bottom:1px solid var(--border)}
+  .table td{padding:14px 8px;border-bottom:1px solid rgba(36,48,71,.5)}
+  .table tr:last-child td{border-bottom:none}
+  .table .acc-cell{display:flex;align-items:center;gap:10px}
+  .table .acc-cell .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .table .acc-cell img.acc-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;
+    flex-shrink:0;background:var(--bg-2)}
+  .table .acc-cell .acc-fallback{width:36px;height:36px;border-radius:50%;
+    background:linear-gradient(135deg,var(--accent),#7c3aed);display:grid;place-items:center;
+    font-weight:700;color:#fff;font-size:14px;flex-shrink:0}
+  .dot.on{background:var(--green);box-shadow:0 0 8px var(--green)}
+  .dot.off{background:var(--red)}
+  .pill{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:600;display:inline-block}
+  .pill.green{background:rgba(34,197,94,.14);color:#86efac}
+  .pill.red{background:rgba(239,68,68,.14);color:#fca5a5}
+  .pill.yellow{background:rgba(245,158,11,.14);color:#fcd34d}
+  .pill.blue{background:rgba(59,130,246,.14);color:#93c5fd}
+  .switch{position:relative;display:inline-block;width:42px;height:24px;flex-shrink:0}
+  .switch input{opacity:0;width:0;height:0}
+  .switch .slider{position:absolute;inset:0;background:var(--border);border-radius:24px;
+    transition:.3s;cursor:pointer}
+  .switch .slider::before{content:"";position:absolute;width:18px;height:18px;
+    left:3px;top:3px;background:#fff;border-radius:50%;transition:.3s}
+  .switch input:checked + .slider{background:var(--accent)}
+  .switch input:checked + .slider::before{transform:translateX(18px)}
+  .empty{text-align:center;padding:50px 20px;color:var(--muted)}
+  .empty .big{font-size:48px;margin-bottom:14px;opacity:.5}
+  .empty h3{color:var(--text);font-size:17px;margin-bottom:6px}
+  .empty p{font-size:14px;margin-bottom:18px}
+  .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);
+    background:var(--panel-2);border:1px solid var(--border);border-radius:12px;
+    padding:13px 22px;font-size:14px;box-shadow:var(--shadow);z-index:200;
+    display:flex;align-items:center;gap:10px;opacity:0;transition:.35s;
+    pointer-events:none;max-width:90vw}
+  .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+  .toast.green{border-color:rgba(34,197,94,.5);color:#86efac}
+  .toast.red{border-color:rgba(239,68,68,.5);color:#fca5a5}
+  .modal-back{position:fixed;inset:0;background:rgba(0,0,0,.65);
+    backdrop-filter:blur(4px);display:none;place-items:center;z-index:150;padding:20px}
+  .modal-back.show{display:grid}
+  .modal{background:var(--panel);border:1px solid var(--border);border-radius:16px;
+    max-width:520px;width:100%;padding:26px;box-shadow:var(--shadow);
+    max-height:90vh;overflow-y:auto}
+  .modal h3{margin-bottom:8px}
+  .modal p{color:var(--muted);font-size:14px;margin-bottom:20px;line-height:1.7}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap}
+  .modal .field input,.modal .field textarea{background:#0f1623}
+  .tabs{display:flex;gap:6px;margin-bottom:20px;border-bottom:1px solid var(--border);
+    overflow-x:auto;padding-bottom:0}
+  .tab{padding:10px 16px;font-size:13px;font-weight:600;color:var(--muted);
+    background:transparent;border:none;cursor:pointer;border-bottom:2px solid transparent;
+    white-space:nowrap;transition:.2s}
+  .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+  .tab:hover{color:var(--text)}
+  .hold-btn{width:100%;padding:16px;border-radius:12px;font-size:15px;font-weight:700;
+    background:rgba(239,68,68,.15);border:2px solid rgba(239,68,68,.4);
+    color:#fca5a5;position:relative;overflow:hidden;user-select:none;
+    -webkit-user-select:none;touch-action:none}
+  .hold-btn .progress{position:absolute;top:0;right:0;bottom:0;width:0%;
+    background:rgba(34,197,94,.35);transition:width .1s linear}
+  .hold-btn span{position:relative;z-index:1}
+  .hold-btn.holding{background:rgba(34,197,94,.1);border-color:var(--green);color:#86efac}
+  .phrase-box{background:var(--bg-2);border:1px dashed var(--border);border-radius:10px;
+    padding:14px;margin:12px 0;display:flex;justify-content:space-between;
+    align-items:center;gap:10px;direction:ltr}
+  .phrase-box code{color:#93c5fd;font-size:14px;font-weight:700;font-family:'Consolas',monospace}
+  .phrase-box button{background:var(--panel-2);color:var(--text);border:1px solid var(--border);
+    border-radius:8px;padding:6px 12px;font-size:12px}
+  .phrase-box button:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+  .dialog-item{display:flex;align-items:center;gap:12px;padding:12px;
+    border-radius:10px;background:var(--bg-2);border:1px solid var(--border);
+    cursor:pointer;transition:.2s;margin-bottom:8px}
+  .dialog-item:hover{border-color:var(--accent);background:#1a2336}
+  .dialog-item .d-avatar{width:44px;height:44px;border-radius:50%;flex-shrink:0;
+    background:linear-gradient(135deg,var(--accent),#7c3aed);display:grid;
+    place-items:center;font-weight:700;color:#fff;font-size:16px}
+  .dialog-item .d-info{flex:1;min-width:0}
+  .dialog-item .d-info b{display:block;font-size:14px;margin-bottom:2px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dialog-item .d-info small{color:var(--muted);font-size:12px;
+    display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dialog-item .d-meta{text-align:left;flex-shrink:0}
+  .dialog-item .d-meta small{color:var(--muted);font-size:11px;display:block}
+  .msg-bubble{display:flex;gap:10px;margin-bottom:14px;padding:10px;
+    background:var(--bg-2);border-radius:12px;border:1px solid var(--border)}
+  .msg-bubble.out{background:rgba(59,130,246,.08);border-color:rgba(59,130,246,.25)}
+  .msg-bubble .m-avatar{width:36px;height:36px;border-radius:50%;flex-shrink:0;
+    background:linear-gradient(135deg,#7c3aed,var(--accent));display:grid;
+    place-items:center;font-weight:700;color:#fff;font-size:13px}
+  .msg-bubble .m-body{flex:1;min-width:0}
+  .msg-bubble .m-head{display:flex;justify-content:space-between;
+    align-items:center;margin-bottom:4px;gap:8px}
+  .msg-bubble .m-head b{font-size:13px}
+  .msg-bubble .m-head small{color:var(--muted);font-size:11px}
+  .msg-bubble .m-text{font-size:14px;line-height:1.6;word-wrap:break-word;white-space:pre-wrap}
+  .filter-row{display:flex;align-items:center;justify-content:space-between;
+    gap:14px;padding:14px;background:var(--bg-2);border-radius:10px;
+    border:1px solid var(--border);margin-bottom:8px}
+  .filter-row.unread{border-color:rgba(59,130,246,.4);background:rgba(59,130,246,.05)}
+  .filter-row .fl{display:flex;align-items:center;gap:12px;min-width:0}
+  .filter-row .fl .ico{font-size:18px;flex-shrink:0}
+  .filter-row .fl b{font-size:14px;display:block}
+  .filter-row .fl small{color:var(--muted);font-size:12px;display:block;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:400px}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .form-grid .full{grid-column:1/-1}
+  select{width:100%;padding:12px 14px;border-radius:10px;background:var(--bg-2);
+    border:1px solid var(--border);color:var(--text);font-size:14px}
+  select:focus{border-color:var(--accent);outline:none}
+  .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.2);
+    border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;
+    display:inline-block}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .conn-status{display:inline-flex;align-items:center;gap:6px;font-size:12px;
+    color:var(--muted);padding:4px 10px;border-radius:20px;
+    background:var(--bg-2);border:1px solid var(--border)}
+  .conn-status .dot{width:8px;height:8px;border-radius:50%;background:var(--green)}
+  .conn-status.off .dot{background:var(--red)}
+  @media(max-width:860px){
+    .hero{grid-template-columns:1fr;padding:40px 20px}
+    .hero-visual{height:260px;order:-1}
+    .sidebar{width:70px;padding:16px 8px}
+    .sidebar .profile-mini .info,.sidebar .nav-item .txt,.sidebar .nav-item .badge{display:none}
+    .nav-item{justify-content:center;padding:12px}
+    .main{padding:20px 16px}
+    .form-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">🛡️</div>
+    <div>وهمياتي <small>حماية حساباتك الوهمية</small></div>
+  </div>
+  <div class="top-actions" id="topActions"></div>
+</header>
+
+<section class="landing active" id="landingPage">
+  <div class="hero">
+    <div>
+      <h1>احمِ حساباتك الوهمية <span>قبل أن تضيع</span></h1>
+      <p>وهمياتي منصة متكاملة لإدارة حسابات تلغرام الوهمية — تنبيهات فورية عند وصول أكواد التحقق، نسخ احتياطي للجلسات، استكشاف المحادثات، وإدارة كاملة من لوحة واحدة.</p>
+      <div class="hero-cta">
+        <button class="btn btn-primary" onclick="goStep('signup')">🚀 إنشاء حساب</button>
+        <button class="btn btn-ghost" onclick="goStep('login')">تسجيل الدخول</button>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="glass">
+        <div class="sk-row">
+          <div class="sk-avatar"></div>
+          <div class="sk-lines">
+            <div class="skeleton" style="width:60%"></div>
+            <div class="skeleton" style="width:40%;height:9px"></div>
+          </div>
+        </div>
+        <div class="skeleton" style="width:100%"></div>
+        <div class="skeleton" style="width:85%"></div>
+        <div class="skeleton" style="width:70%"></div>
+        <div class="skeleton" style="width:92%"></div>
+        <div class="skeleton" style="width:55%"></div>
+      </div>
+    </div>
+  </div>
+  <div class="features">
+    <h2>لماذا وهمياتي؟</h2>
+    <p class="sub">كل ما تحتاجه لحماية وإدارة حساباتك في مكان واحد</p>
+    <div class="grid">
+      <div class="card"><div class="ico">📱</div><h3>تسجيل يدوي كامل</h3><p>أضف حسابك برقم الهاتف + كود التحقق + 2FA — بدون الحاجة لملف جلسة.</p></div>
+      <div class="card"><div class="ico">🤖</div><h3>بوت تفاعلي</h3><p>البوت يرد عليك فوراً ويرشدك خلال التسجيل والتحقق.</p></div>
+      <div class="card"><div class="ico">🔔</div><h3>تنبيهات فورية</h3><p>استلم أكواد التحقق والرسائل الجديدة عبر بوت تلغرام لحظة وصولها.</p></div>
+      <div class="card"><div class="ico">💬</div><h3>استكشاف المحادثات</h3><p>تصفح محادثات أي حساب ورسائله من داخل المنصة.</p></div>
+      <div class="card"><div class="ico">🛡️</div><h3>حذف آمن بـ 3 خطوات</h3><p>تأكيد مطوّل + كلمة سرية عبر البوت — لا حذف بالخطأ.</p></div>
+      <div class="card"><div class="ico">📊</div><h3>معلومات البروفايل</h3><p>يستورد اسمك وصورتك من تلغرام تلقائياً.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="auth-wrap" id="authPage">
+  <div class="auth-card" id="authCard"></div>
+</section>
+
+<section class="app" id="appPage">
+  <aside class="sidebar">
+    <div class="profile-mini" id="sidebarProfile"></div>
+    <nav class="nav" id="sidebarNav">
+      <button class="nav-item active" data-page="dashboard"><span class="ico">📊</span><span class="txt">لوحة التحكم</span></button>
+      <button class="nav-item" data-page="accounts"><span class="ico">📁</span><span class="txt">حساباتي</span><span class="badge" id="accBadge">0</span></button>
+      <button class="nav-item" data-page="alerts"><span class="ico">🔔</span><span class="txt">التنبيهات</span><span class="badge" id="alertBadge" style="display:none">0</span></button>
+      <button class="nav-item" data-page="targets"><span class="ico">📮</span><span class="txt">أهداف التنبيه</span></button>
+      <div class="nav-sep"></div>
+      <button class="nav-item" data-page="logs"><span class="ico">📝</span><span class="txt">سجل العمليات</span></button>
+      <button class="nav-item" data-page="settings"><span class="ico">⚙️</span><span class="txt">الإعدادات</span></button>
+      <button class="nav-item" onclick="logout()"><span class="ico">🚪</span><span class="txt">تسجيل الخروج</span></button>
+    </nav>
+  </aside>
+  <main class="main" id="mainContent"></main>
+</section>
+
+<div class="toast" id="toast"></div>
+<div class="modal-back" id="modalBack">
+  <div class="modal" id="modalBox"></div>
+</div>
+
+<script>
+const API_BASE = (function(){
+  const p = window.location.pathname;
+  const m = p.match(/^\/t\/[^\/]+/);
+  if (m) return window.location.origin + m[0];
+  return window.location.origin;
+})();
+
+let TOKEN = localStorage.getItem("thm_token") || "";
+let CURRENT_USER = null;
+let ACCOUNTS_CACHE = [];
+let alertPollTimer = null;
+let unreadCount = 0;
+
+async function api(path, opts = {}) {
+  const headers = { "Content-Type": "application/json", ...(opts.headers || {}) };
+  if (TOKEN) headers["Authorization"] = "Bearer " + TOKEN;
+  const res = await fetch(API_BASE + path, { ...opts, headers });
+  let data = {};
+  try { data = await res.json(); } catch (e) {}
+  if (!res.ok) {
+    const msg = data.detail || data.error || "خطأ في الخادم";
+    throw new Error(msg);
+  }
+  return data;
+}
+
+function $(id) { return document.getElementById(id); }
+function escapeHtml(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+function showToast(msg, type = "") {
+  const t = $("toast");
+  t.className = "toast show " + type;
+  t.innerHTML = (type === "green" ? "✅ " : type === "red" ? "❌ " : "💡 ") + escapeHtml(msg);
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove("show"), 3500);
+}
+function timeAgo(iso) {
+  if (!iso) return "";
+  const d = new Date(iso).getTime();
+  if (isNaN(d)) return "";
+  const s = Math.floor((Date.now() - d) / 1000);
+  if (s < 60) return "الآن";
+  if (s < 3600) return `منذ ${Math.floor(s / 60)} د`;
+  if (s < 86400) return `منذ ${Math.floor(s / 3600)} س`;
+  return `منذ ${Math.floor(s / 86400)} ي`;
+}
+function openModal(html) { $("modalBox").innerHTML = html; $("modalBack").classList.add("show"); }
+function closeModal() { $("modalBack").classList.remove("show"); }
+$("modalBack").addEventListener("click", e => {
+  if (e.target.id === "modalBack") closeModal();
+});
+
+function showPage(id) {
+  ["landingPage", "authPage", "appPage"].forEach(p => {
+    const e = $(p);
+    e.classList.remove("active");
+    e.style.display = "none";
+  });
+  const t = $(id);
+  t.classList.add("active");
+  if (id === "appPage") t.style.display = "flex";
+  else if (id === "authPage") t.style.display = "grid";
+  else t.style.display = "flex";
+  window.scrollTo(0, 0);
+}
+
+function renderTopActions() {
+  const box = $("topActions");
+  box.innerHTML = "";
+  if (CURRENT_USER) {
+    box.innerHTML = `
+      <span class="conn-status" id="connStatus"><span class="dot"></span>متصل</span>
+      <button class="btn btn-ghost" onclick="goApp()">لوحة التحكم</button>
+      <button class="btn btn-primary" onclick="logout()">خروج</button>`;
+  } else {
+    box.innerHTML = `
+      <button class="btn btn-ghost" onclick="goStep('login')">تسجيل الدخول</button>
+      <button class="btn btn-primary" onclick="goStep('signup')">إنشاء حساب</button>`;
+  }
+}
+
+let authState = { step: "signup", code: "", username: "", name: "", avatar: "", botUrl: "" };
+
+function goStep(step, opts = {}) {
+  authState.step = step;
+  if (opts.code) authState.code = opts.code;
+  if (opts.botUrl) authState.botUrl = opts.botUrl;
+  showPage("authPage");
+  renderAuthStep();
+}
+
+function renderAuthStep() {
+  const card = $("authCard");
+  const s = authState.step;
+
+  if (s === "signup") {
+    card.innerHTML = `
+      <div class="step-dots"><span class="active"></span><span></span><span></span><span></span></div>
+      <span class="step-badge">الخطوة 1 من 4</span>
+      <h2>إنشاء حساب جديد</h2>
+      <p class="desc">أدخل اسم المستخدم في تلغرام (بدون @). سنولّد كوداً سترسله للبوت <b>@THMITE33BOT</b>.</p>
+      <div class="field">
+        <label>اسم المستخدم في تلغرام</label>
+        <input id="inpTgUser" placeholder="@username" value="${escapeHtml(authState.username || "")}">
+        <div class="error" id="errTgUser">أدخل اسم مستخدم صالح (3 أحرف على الأقل، حروف/أرقام/_)</div>
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="submitTgUsername()">متابعة</button>
+      <div class="divider">أو</div>
+      <button class="btn btn-ghost" style="width:100%" onclick="goStep('login')">لديك حساب؟ سجّل الدخول</button>
+    `;
+    setTimeout(() => {
+      const i = $("inpTgUser");
+      if (i) { i.focus(); i.onkeydown = e => { if (e.key === "Enter") submitTgUsername(); }; }
+    }, 50);
+    return;
+  }
+
+  if (s === "sendCode") {
+    card.innerHTML = `
+      <div class="step-dots"><span class="done"></span><span class="active"></span><span></span><span></span></div>
+      <span class="step-badge">الخطوة 2 من 4</span>
+      <h2>تحقق عبر بوت تلغرام</h2>
+      <p class="desc">الآن اذهب إلى بوت تلغرام <b>@THMITE33BOT</b> وسيتواصل معك تلقائياً. سيطلب منك إرسال الكود التالي:</p>
+      <div class="copy-box">
+        <code id="codeText">${escapeHtml(authState.code)}</code>
+        <button onclick="copyCode()">📋 نسخ</button>
+      </div>
+      <a href="${escapeHtml(authState.botUrl || 'https://t.me/THMITE33BOT')}" target="_blank" class="bot-link">
+        🤖 فتح البوت في تلغرام
+      </a>
+      <div class="waiting" id="waitingText">
+        <span class="spinner"></span> في انتظار التحقق من البوت...
+      </div>
+      <button class="btn btn-ghost" style="width:100%" onclick="goStep('signup')">🔙 رجوع</button>
+    `;
+    setTimeout(pollVerifyOtp, 2000);
+    return;
+  }
+
+  if (s === "setPassword") {
+    const initial = (authState.name || "?").slice(0,1).toUpperCase();
+    card.innerHTML = `
+      <div class="step-dots"><span class="done"></span><span class="done"></span><span class="done"></span><span class="active"></span></div>
+      <span class="step-badge">الخطوة 4 من 4</span>
+      <div style="text-align:center;margin-bottom:16px">
+        ${authState.avatar
+          ? `<img src="${escapeHtml(authState.avatar)}" style="width:76px;height:76px;border-radius:50%;object-fit:cover;border:2px solid var(--accent)">`
+          : `<div style="width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#7c3aed);display:inline-grid;place-items:center;font-size:32px;font-weight:700;color:#fff">${escapeHtml(initial)}</div>`}
+      </div>
+      <h2 style="text-align:center">مرحباً ${escapeHtml(authState.name || "")}!</h2>
+      <p class="desc" style="text-align:center">أخيراً، أنشئ كلمة مرور لحماية حسابك في وهمياتي.</p>
+      <div class="field">
+        <label>كلمة المرور</label>
+        <input id="inpPw" type="password" placeholder="••••••••">
+        <div class="pw-strength" id="pwBar"><i></i><i></i><i></i><i></i></div>
+        <div class="pw-strength-text" id="pwText">أدخل 8 أحرف على الأقل</div>
+      </div>
+      <div class="field">
+        <label>تأكيد كلمة المرور</label>
+        <input id="inpPw2" type="password" placeholder="••••••••">
+        <div class="error" id="errPw"></div>
+      </div>
+      <button class="btn btn-primary" style="width:100%" id="createAccBtn" onclick="submitPassword()">إنشاء الحساب</button>
+    `;
+    setTimeout(() => {
+      const pw = $("inpPw");
+      if (pw) {
+        pw.focus();
+        pw.oninput = updatePwStrength;
+        pw.onkeydown = e => { if (e.key === "Enter") $("inpPw2").focus(); };
+        $("inpPw2").onkeydown = e => { if (e.key === "Enter") submitPassword(); };
+      }
+    }, 60);
+    return;
+  }
+
+  if (s === "welcome") {
+    const initial = (authState.name || "صديقي").slice(0,1).toUpperCase();
+    card.innerHTML = `
+      <div class="success-card">
+        ${authState.avatar
+          ? `<img src="${escapeHtml(authState.avatar)}" style="width:96px;height:96px;border-radius:50%;object-fit:cover;margin:0 auto 20px;border:3px solid var(--green);display:block">`
+          : `<div style="width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#7c3aed);display:grid;place-items:center;font-size:40px;font-weight:700;color:#fff;margin:0 auto 20px">${escapeHtml(initial)}</div>`}
+        <h2>مرحباً، ${escapeHtml(authState.name || "صديقي")}! 🎉</h2>
+        <p class="desc" style="margin-top:10px">تم إنشاء حسابك بنجاح.</p>
+        <button class="btn btn-primary" style="width:100%;margin-top:10px" onclick="enterApp()">🚀 ابدأ الآن</button>
+      </div>
+    `;
+    return;
+  }
+
+  if (s === "login") {
+    card.innerHTML = `
+      <span class="step-badge">تسجيل الدخول</span>
+      <h2>أهلاً بعودتك</h2>
+      <p class="desc">سجّل الدخول للوصول إلى حساباتك المحمية.</p>
+      <div class="field">
+        <label>اسم المستخدم في تلغرام</label>
+        <input id="inpLoginUser" placeholder="@username">
+      </div>
+      <div class="field">
+        <label>كلمة المرور</label>
+        <input id="inpLoginPw" type="password" placeholder="••••••••">
+        <div class="error" id="errLogin"></div>
+      </div>
+      <button class="btn btn-primary" style="width:100%" id="loginBtn" onclick="submitLogin()">دخول</button>
+      <div class="divider">ليس لديك حساب؟</div>
+      <button class="btn btn-ghost" style="width:100%" onclick="goStep('signup')">إنشاء حساب جديد</button>
+    `;
+    setTimeout(() => {
+      const u = $("inpLoginUser");
+      if (u) { u.focus(); u.onkeydown = e => { if (e.key === "Enter") $("inpLoginPw").focus(); }; }
+      const p = $("inpLoginPw");
+      if (p) p.onkeydown = e => { if (e.key === "Enter") submitLogin(); };
+    }, 50);
+    return;
+  }
+}
+
+function copyCode() {
+  const txt = $("codeText").textContent.trim();
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(txt).then(() => showToast("تم النسخ", "green"))
+      .catch(() => showToast("انسخه يدوياً", "red"));
+  }
+}
+
+async function submitTgUsername() {
+  const val = ($("inpTgUser").value || "").replace("@", "").trim().toLowerCase();
+  const err = $("errTgUser");
+  if (val.length < 3 || !/^[a-z0-9_]+$/.test(val)) { err.classList.add("show"); return; }
+  err.classList.remove("show");
+  let res;
+  try {
+    res = await api("/auth/signup/step1", { method: "POST", body: JSON.stringify({ tg_username: val }) });
+  } catch (e) { err.textContent = e.message; err.classList.add("show"); return; }
+  authState.username = val;
+  authState.code = res.code;
+  authState.botUrl = res.bot_url || "https://t.me/THMITE33BOT";
+  goStep("sendCode");
+}
+
+let verifyTimer = null;
+async function pollVerifyOtp() {
+  if (authState.step !== "sendCode") return;
+  try {
+    const res = await api("/auth/signup/verify-otp", {
+      method: "POST",
+      body: JSON.stringify({ tg_username: authState.username })
+    });
+    authState.name = res.name;
+    authState.avatar = res.avatar;
+    goStep("setPassword");
+  } catch (e) {
+    // continue polling
+    const w = $("waitingText");
+    if (w) w.innerHTML = `<span class="spinner"></span> ${escapeHtml(e.message || "في انتظار التحقق...")}`;
+    setTimeout(pollVerifyOtp, 3000);
+  }
+}
+
+function updatePwStrength() {
+  const pw = $("inpPw").value;
+  const bar = $("pwBar").children;
+  const txt = $("pwText");
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (/[a-zA-Z]/.test(pw)) score++;
+  if (/\d/.test(pw)) score++;
+  if (/[^a-zA-Z0-9]/.test(pw)) score++;
+  const cls = score <= 1 ? "bad" : score <= 2 ? "mid" : "ok";
+  for (let i = 0; i < 4; i++) bar[i].className = i < score ? cls : "";
+  const labels = ["ضعيفة جداً", "ضعيفة", "متوسطة", "قوية"];
+  txt.textContent = pw.length ? "قوة كلمة المرور: " + labels[Math.max(0, score - 1)] : "أدخل 8 أحرف على الأقل";
+}
+
+async function submitPassword() {
+  const pw = $("inpPw").value, pw2 = $("inpPw2").value;
+  const err = $("errPw");
+  if (pw.length < 8 || !/[a-zA-Z]/.test(pw) || !/\d/.test(pw)) {
+    err.textContent = "8 أحرف على الأقل، مع حروف وأرقام";
+    err.classList.add("show"); return;
+  }
+  if (pw !== pw2) {
+    err.textContent = "كلمتا المرور غير متطابقتين";
+    err.classList.add("show"); return;
+  }
+  err.classList.remove("show");
+  const btn = $("createAccBtn");
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> إنشاء...';
+  try {
+    const res = await api("/auth/signup/set-password", {
+      method: "POST",
+      body: JSON.stringify({ tg_username: authState.username, password: pw })
+    });
+    TOKEN = res.access_token;
+    localStorage.setItem("thm_token", TOKEN);
+    CURRENT_USER = res.user;
+    renderTopActions();
+    goStep("welcome");
+  } catch (e) {
+    btn.disabled = false; btn.textContent = "إنشاء الحساب";
+    err.textContent = e.message; err.classList.add("show");
+  }
+}
+
+async function submitLogin() {
+  const u = ($("inpLoginUser").value || "").replace("@", "").trim().toLowerCase();
+  const p = $("inpLoginPw").value;
+  const err = $("errLogin");
+  if (!u || !p) { err.textContent = "أدخل البيانات"; err.classList.add("show"); return; }
+  err.classList.remove("show");
+  const btn = $("loginBtn");
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> دخول...';
+  try {
+    const res = await api("/auth/login", { method: "POST", body: JSON.stringify({ tg_username: u, password: p }) });
+    TOKEN = res.access_token;
+    localStorage.setItem("thm_token", TOKEN);
+    CURRENT_USER = res.user;
+    renderTopActions();
+    enterApp();
+  } catch (e) {
+    btn.disabled = false; btn.textContent = "دخول";
+    err.textContent = e.message; err.classList.add("show");
+  }
+}
+
+function enterApp() { renderTopActions(); goApp(); }
+
+async function logout() {
+  try { await api("/auth/logout", { method: "POST" }); } catch (e) {}
+  if (alertPollTimer) { clearInterval(alertPollTimer); alertPollTimer = null; }
+  TOKEN = ""; CURRENT_USER = null;
+  localStorage.removeItem("thm_token");
+  renderTopActions();
+  showPage("landingPage");
+  showToast("تم تسجيل الخروج", "green");
+}
+
+async function goApp() {
+  if (!TOKEN) { goStep("login"); return; }
+  if (!CURRENT_USER) {
+    try { CURRENT_USER = await api("/me"); }
+    catch (e) { logout(); return; }
+  }
+  showPage("appPage");
+  renderSidebar();
+  await refreshAccounts();
+  await refreshUnread();
+  await navigate("dashboard");
+  startAlertPolling();
+}
+
+function startAlertPolling() {
+  if (alertPollTimer) clearInterval(alertPollTimer);
+  alertPollTimer = setInterval(async () => {
+    try { await refreshUnread(); } catch (e) {}
+  }, 12000);
+}
+
+async function refreshUnread() {
+  try {
+    const r = await api("/alerts/unread");
+    unreadCount = r.unread || 0;
+    const badge = $("alertBadge");
+    if (badge) {
+      badge.style.display = unreadCount > 0 ? "" : "none";
+      badge.textContent = unreadCount > 99 ? "99+" : unreadCount;
+    }
+  } catch (e) {}
+}
+
+function renderSidebar() {
+  const p = $("sidebarProfile");
+  if (CURRENT_USER) {
+    const initial = (CURRENT_USER.tg_name || CURRENT_USER.tg_username || "?").slice(0,1).toUpperCase();
+    p.innerHTML = `
+      ${CURRENT_USER.tg_avatar
+        ? `<img src="${escapeHtml(CURRENT_USER.tg_avatar)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><div class="avatar-fallback" style="display:none">${escapeHtml(initial)}</div>`
+        : `<div class="avatar-fallback">${escapeHtml(initial)}</div>`}
+      <div class="info">
+        <b>${escapeHtml(CURRENT_USER.tg_name || CURRENT_USER.tg_username)}</b>
+        <small>@${escapeHtml(CURRENT_USER.tg_username)}</small>
+      </div>`;
+  }
+  $("accBadge").textContent = ACCOUNTS_CACHE.length;
+}
+
+document.querySelectorAll(".nav-item[data-page]").forEach(b => {
+  b.addEventListener("click", () => navigate(b.dataset.page));
+});
+
+async function navigate(page) {
+  document.querySelectorAll(".nav-item[data-page]").forEach(b => {
+    b.classList.toggle("active", b.dataset.page === page);
+  });
+  const main = $("mainContent");
+  main.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted)"><span class="spinner"></span> تحميل...</div>';
+  try {
+    if (page === "dashboard") await renderDashboard(main);
+    else if (page === "accounts") await renderAccounts(main);
+    else if (page === "alerts") await renderAlerts(main);
+    else if (page === "targets") await renderTargets(main);
+    else if (page === "logs") await renderLogs(main);
+    else if (page === "settings") renderSettings(main);
+  } catch (e) {
+    main.innerHTML = `<div class="panel"><p style="color:#fca5a5">❌ ${escapeHtml(e.message)}</p></div>`;
+  }
+}
+
+async function refreshAccounts() {
+  try {
+    ACCOUNTS_CACHE = await api("/accounts");
+    const b = $("accBadge");
+    if (b) b.textContent = ACCOUNTS_CACHE.length;
+  } catch (e) { ACCOUNTS_CACHE = []; }
+}
+
+function renderAccountAvatar(a) {
+  const initial = (a.tg_name || a.label || a.phone || "?").slice(0,1).toUpperCase();
+  if (a.tg_avatar) {
+    return `<img class="acc-avatar" src="${escapeHtml(a.tg_avatar)}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><div class="acc-fallback" style="display:none">${escapeHtml(initial)}</div>`;
+  }
+  return `<div class="acc-fallback">${escapeHtml(initial)}</div>`;
+}
+
+async function renderDashboard(main) {
+  const valid = ACCOUNTS_CACHE.filter(a => a.is_valid).length;
+  const invalid = ACCOUNTS_CACHE.length - valid;
+  let alerts = [];
+  try { alerts = await api("/alerts?limit=5"); } catch (e) {}
+
+  main.innerHTML = `
+    <div class="page-head">
+      <div><h1>لوحة التحكم</h1><p>نظرة عامة على حساباتك وتنبيهاتك</p></div>
+      <button class="btn btn-primary" onclick="openAddAccount()">➕ إضافة حساب</button>
+    </div>
+    <div class="stats">
+      <div class="stat"><span class="lbl">إجمالي الحسابات</span><span class="val blue">${ACCOUNTS_CACHE.length}</span></div>
+      <div class="stat"><span class="lbl">جلسات نشطة</span><span class="val green">${valid}</span></div>
+      <div class="stat"><span class="lbl">جلسات تالفة</span><span class="val yellow">${invalid}</span></div>
+      <div class="stat"><span class="lbl">تنبيهات غير مقروءة</span><span class="val">${unreadCount}</span></div>
+    </div>
+    <div class="panel">
+      <h3>🔔 آخر التنبيهات</h3>
+      ${alerts.length ? alerts.map(a => `
+        <div class="filter-row ${a.is_read ? '' : 'unread'}">
+          <div class="fl">
+            <span class="ico">${a.is_code ? "🔐" : "💬"}</span>
+            <div>
+              <b>${escapeHtml(a.sender || "—")}
+                <span class="pill ${a.is_code ? "yellow" : "blue"}">${a.is_code ? "كود" : "رسالة"}</span>
+              </b>
+              <small>${escapeHtml((a.text || "").slice(0, 60))}</small>
+            </div>
+          </div>
+          <small style="color:var(--muted);flex-shrink:0">${timeAgo(a.created_at)}</small>
+        </div>`).join("") :
+        `<div class="empty"><div class="big">🔕</div><h3>لا توجد تنبيهات</h3><p>ستظهر هنا عند وصول رسائل</p></div>`}
+    </div>
+    <div class="panel">
+      <h3>📁 حساباتي</h3>
+      ${ACCOUNTS_CACHE.length ? `
+        <table class="table">
+          <thead><tr><th>الحساب</th><th>الحالة</th><th>التنبيهات</th><th>أُضيف</th></tr></thead>
+          <tbody>${ACCOUNTS_CACHE.slice(0, 5).map(a => `
+            <tr>
+              <td><div class="acc-cell">${renderAccountAvatar(a)}<div><b>${escapeHtml(a.label || a.phone)}</b>${a.tg_username ? `<br><small style="color:var(--muted)">@${escapeHtml(a.tg_username)}</small>` : ""}</div></div></td>
+              <td>${a.is_valid ? '<span class="pill green">نشط</span>' : '<span class="pill red">تالف</span>'}</td>
+              <td>${a.notify_enabled ? '<span class="pill green">مفعّل</span>' : '<span class="pill red">معطّل</span>'}</td>
+              <td style="color:var(--muted);font-size:12px">${timeAgo(a.created_at)}</td>
+            </tr>`).join("")}</tbody>
+        </table>` : `<div class="empty"><div class="big">📭</div><h3>لا حسابات بعد</h3><button class="btn btn-primary" onclick="openAddAccount()">➕ إضافة حساب</button></div>`}
+    </div>
+  `;
+}
+
+async function renderAccounts(main) {
+  await refreshAccounts();
+  main.innerHTML = `
+    <div class="page-head">
+      <div><h1>حساباتي</h1><p>إدارة جميع حساباتك المسجلة</p></div>
+      <button class="btn btn-primary" onclick="openAddAccount()">➕ إضافة حساب</button>
+    </div>
+    ${ACCOUNTS_CACHE.length ? `
+      <div class="panel">
+        <table class="table">
+          <thead><tr><th>الحساب</th><th>الحالة</th><th>التنبيهات</th><th>إجراءات</th></tr></thead>
+          <tbody>${ACCOUNTS_CACHE.map(a => `
+            <tr>
+              <td><div class="acc-cell">${renderAccountAvatar(a)}<div><b>${escapeHtml(a.label || a.phone)}</b><br><small style="color:var(--muted);direction:ltr;display:inline-block">${escapeHtml(a.phone)}</small>${a.tg_username ? `<br><small style="color:var(--muted)">@${escapeHtml(a.tg_username)}</small>` : ""}</div></div></td>
+              <td>${a.is_valid ? '<span class="pill green">نشط</span>' : '<span class="pill red">تالف</span>'}</td>
+              <td>
+                <label class="switch">
+                  <input type="checkbox" ${a.notify_enabled ? "checked" : ""} onchange="toggleNotify(${a.id})">
+                  <span class="slider"></span>
+                </label>
+              </td>
+              <td style="white-space:nowrap">
+                <button class="btn btn-ghost" style="padding:6px 10px;font-size:12px" onclick="exploreAccount(${a.id})">🔍</button>
+                <button class="btn btn-ghost" style="padding:6px 10px;font-size:12px" onclick="checkAccount(${a.id})">🔄</button>
+                <button class="btn btn-ghost" style="padding:6px 10px;font-size:12px" onclick="downloadSession(${a.id})">⬇️</button>
+                <button class="btn btn-danger" style="padding:6px 10px;font-size:12px" onclick="startDelete(${a.id})">🗑️</button>
+              </td>
+            </tr>`).join("")}</tbody>
+        </table>
+      </div>` : `<div class="panel"><div class="empty"><div class="big">📭</div><h3>لا حسابات بعد</h3><p>أضف أول حساب وهمي</p><button class="btn btn-primary" onclick="openAddAccount()">➕ إضافة حساب</button></div></div>`}
+  `;
+}
+
+let addTabState = "phone";
+let manualLoginState = { stage: "phone", phone: "" };
+
+function openAddAccount() {
+  addTabState = "phone";
+  manualLoginState = { stage: "phone", phone: "" };
+  openModal(`
+    <h3>➕ إضافة حساب جديد</h3>
+    <div class="tabs">
+      <button class="tab ${addTabState==='phone'?'active':''}" onclick="switchAddTab('phone')">📱 تسجيل يدوي</button>
+      <button class="tab ${addTabState==='file'?'active':''}" onclick="switchAddTab('file')">📁 ملف جلسة</button>
+      <button class="tab ${addTabState==='string'?'active':''}" onclick="switchAddTab('string')">🔑 StringSession</button>
+    </div>
+    <div id="addTabBody"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="cancelAddAccount()">إلغاء</button>
+    </div>
+  `);
+  renderAddTab();
+}
+
+function switchAddTab(tab) {
+  addTabState = tab;
+  document.querySelectorAll(".modal .tab").forEach((b, i) => {
+    b.classList.toggle("active",
+      (i === 0 && tab === "phone") || (i === 1 && tab === "file") || (i === 2 && tab === "string"));
+  });
+  renderAddTab();
+}
+
+function cancelAddAccount() {
+  if (addTabState === "phone" && manualLoginState.stage !== "phone") {
+    try { api("/accounts/login/cancel", { method: "POST" }).catch(()=>{}); } catch(e){}
+  }
+  closeModal();
+}
+
+function renderAddTab() {
+  const box = $("addTabBody");
+  if (!box) return;
+
+  if (addTabState === "phone") {
+    if (manualLoginState.stage === "phone") {
+      box.innerHTML = `
+        <p>أدخل رقم هاتف الحساب الوهمي مع مفتاح الدولة. سيصلك كود تحقق من تلغرام.</p>
+        <div class="field">
+          <label>رقم الهاتف</label>
+          <input id="loginPhone" placeholder="+964xxxxxxxxxx">
+        </div>
+        <div class="form-grid">
+          <div class="field">
+            <label>api_id (اختياري)</label>
+            <input id="loginApiId" type="number" placeholder="2040">
+          </div>
+          <div class="field">
+            <label>api_hash (اختياري)</label>
+            <input id="loginApiHash" placeholder="اتركه فارغاً">
+          </div>
+        </div>
+        <div class="error" id="errPhone"></div>
+        <button class="btn btn-primary" style="width:100%;margin-top:10px" id="btnLoginStart" onclick="startManualLogin()">إرسال الكود</button>
+      `;
+    } else if (manualLoginState.stage === "code") {
+      box.innerHTML = `
+        <p>أرسلنا كوداً إلى <b>${escapeHtml(manualLoginState.phone)}</b>. أدخله هنا:</p>
+        <div class="field">
+          <label>كود التحقق</label>
+          <input id="loginCode" placeholder="12345" autocomplete="off">
+        </div>
+        <div class="error" id="errCode"></div>
+        <button class="btn btn-primary" style="width:100%;margin:10px 0" id="btnVerifyCode" onclick="verifyManualCode()">تحقق</button>
+        <button class="btn btn-ghost" style="width:100%" onclick="cancelManualStage()">🔙 تغيير الرقم</button>
+      `;
+      setTimeout(() => { const i = $("loginCode"); if (i) { i.focus(); i.onkeydown = e => { if (e.key === "Enter") verifyManualCode(); }; } }, 50);
+    } else if (manualLoginState.stage === "2fa") {
+      box.innerHTML = `
+        <p>🔐 هذا الحساب محمي بكلمة مرور بخطوتين. أدخلها للمتابعة:</p>
+        <div class="field">
+          <label>كلمة مرور 2FA</label>
+          <input id="login2fa" type="password" placeholder="••••••••">
+        </div>
+        <div class="error" id="err2fa"></div>
+        <button class="btn btn-primary" style="width:100%;margin-top:10px" id="btnVerify2fa" onclick="verifyManual2FA()">تأكيد</button>
+      `;
+      setTimeout(() => { const i = $("login2fa"); if (i) { i.focus(); i.onkeydown = e => { if (e.key === "Enter") verifyManual2FA(); }; } }, 50);
+    }
+    return;
+  }
+
+  if (addTabState === "file") {
+    box.innerHTML = `
+      <p>ارفع ملف الجلسة (<code>.session</code> أو <code>.txt</code>).</p>
+      <div class="field">
+        <label>ملف الجلسة</label>
+        <input type="file" id="sessionFile" accept=".session,.txt">
+      </div>
+      <div class="field">
+        <label>اسم مميز (اختياري)</label>
+        <input id="fileLabel" placeholder="مثال: حساب العمل">
+      </div>
+      <div class="error" id="errFile"></div>
+      <button class="btn btn-primary" style="width:100%;margin-top:10px" id="btnUploadFile" onclick="uploadSessionFile()">رفع</button>
+    `;
+    return;
+  }
+
+  if (addTabState === "string") {
+    box.innerHTML = `
+      <p>الصق نص StringSession مباشرة.</p>
+      <div class="field">
+        <label>نص الجلسة</label>
+        <textarea id="sessionText" placeholder="1BVtsOK4Bu..."></textarea>
+      </div>
+      <div class="field">
+        <label>اسم مميز (اختياري)</label>
+        <input id="strLabel" placeholder="مثال: حساب العمل">
+      </div>
+      <div class="error" id="errStr"></div>
+      <button class="btn btn-primary" style="width:100%;margin-top:10px" id="btnAddStr" onclick="addStringSession()">إضافة</button>
+    `;
+  }
+}
+
+async function startManualLogin() {
+  const phone = ($("loginPhone").value || "").trim();
+  const apiId = parseInt($("loginApiId").value) || 0;
+  const apiHash = ($("loginApiHash").value || "").trim();
+  const err = $("errPhone");
+  if (!phone.startsWith("+") || phone.length < 8) {
+    err.textContent = "الرقم يجب أن يبدأ بـ + ومفتاح الدولة"; err.classList.add("show"); return;
+  }
+  err.classList.remove("show");
+  const btn = $("btnLoginStart");
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> جاري...';
+  try {
+    await api("/accounts/login/start", {
+      method: "POST",
+      body: JSON.stringify({ phone, api_id: apiId, api_hash: apiHash })
+    });
+    manualLoginState = { stage: "code", phone };
+    renderAddTab();
+  } catch (e) {
+    btn.disabled = false; btn.textContent = "إرسال الكود";
+    err.textContent = e.message; err.classList.add("show");
+  }
+}
+
+async function verifyManualCode() {
+  const code = ($("loginCode").value || "").trim();
+  const err = $("errCode");
+  if (!code || code.length < 3) { err.textContent = "أدخل الكود"; err.classList.add("show"); return; }
+  err.classList.remove("show");
+  const btn = $("btnVerifyCode");
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> جاري...';
+  try {
+    const res = await api("/accounts/login/verify-code", {
+      method: "POST", body: JSON.stringify({ code })
+    });
+    if (res.needs_2fa) {
+      manualLoginState.stage = "2fa";
+      renderAddTab();
+    } else {
+      await onAccountAdded(res);
+    }
+  } catch (e) {
+    btn.disabled = false; btn.textContent = "تحقق";
+    err.textContent = e.message; err.classList.add("show");
+  }
+}
+
+async function verifyManual2FA() {
+  const pw = ($("login2fa").value || "").trim();
+  const err = $("err2fa");
+  if (!pw) { err.textContent = "أدخل كلمة المرور"; err.classList.add("show"); return; }
+  err.classList.remove("show");
+  const btn = $("btnVerify2fa");
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> جاري...';
+  try {
+    const res = await api("/accounts/login/verify-2fa", {
+      method: "POST", body: JSON.stringify({ password: pw })
+    });
+    await onAccountAdded(res);
+  } catch (e) {
+    btn.disabled = false; btn.textContent = "تأكيد";
+    err.textContent = e.message; err.classList.add("show");
+  }
+}
+
+function cancelManualStage() {
+  api("/accounts/login/cancel", { method: "POST" }).catch(()=>{});
+  manualLoginState = { stage: "phone", phone: "" };
+  renderAddTab();
+}
+
+let pendingSessionData = null;
+
+async function uploadSessionFile() {
+  const input = $("sessionFile");
+  const label = ($("fileLabel").value || "").trim();
+  const err = $("errFile");
+  if (!input.files[0]) { err.textContent = "اختر ملف"; err.classList.add("show"); return; }
+  err.classList.remove("show");
+  const btn = $("btnUploadFile");
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> جاري...';
+  try {
+    const fd = new FormData();
+    fd.append("file", input.files[0]);
+    if (label) fd.append("label", label);
+    const res = await fetch(API_BASE + "/accounts/upload-session", {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + TOKEN },
+      body: fd
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "فشل الرفع");
+    if (data.needs_2fa) {
+      showSession2FAPrompt(data.message || "هذا الحساب محمي بكلمة مرور بخطوتين");
+      return;
+    }
+    await onAccountAdded(data);
+  } catch (e) {
+    btn.disabled = false; btn.textContent = "رفع";
+    err.textContent = e.message; err.classList.add("show");
+  }
+}
+
+function showSession2FAPrompt(msg) {
+  const box = $("addTabBody");
+  if (!box) return;
+  box.innerHTML = `
+    <p>🔐 ${escapeHtml(msg)}</p>
+    <div class="field">
+      <label>كلمة مرور 2FA</label>
+      <input id="upload2fa" type="password" placeholder="••••••••">
+    </div>
+    <div class="error" id="errUpload2fa"></div>
+    <button class="btn btn-primary" style="width:100%;margin-top:10px" id="btnUpload2fa" onclick="submitSession2FA()">تأكيد</button>
+  `;
+  setTimeout(() => { const i = $("upload2fa"); if (i) { i.focus(); i.onkeydown = e => { if (e.key === "Enter") submitSession2FA(); }; } }, 50);
+}
+
+async function submitSession2FA() {
+  const pw = ($("upload2fa").value || "").trim();
+  const err = $("errUpload2fa");
+  if (!pw) { err.textContent = "أدخل كلمة المرور"; err.classList.add("show"); return; }
+  err.classList.remove("show");
+  const btn = $("btnUpload2fa");
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> جاري...';
+  try {
+    const res = await api("/accounts/upload-session-2fa", {
+      method: "POST", body: JSON.stringify({ password: pw })
+    });
+    await onAccountAdded(res);
+  } catch (e) {
+    btn.disabled = false; btn.textContent = "تأكيد";
+    err.textContent = e.message; err.classList.add("show");
+  }
+}
+
+async function addStringSession() {
+  const txt = ($("sessionText").value || "").trim();
+  const label = ($("strLabel").value || "").trim();
+  const err = $("errStr");
+  if (txt.length < 50) { err.textContent = "نص الجلسة قصير جداً"; err.classList.add("show"); return; }
+  err.classList.remove("show");
+  const btn = $("btnAddStr");
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> جاري...';
+  try {
+    const res = await api("/accounts", {
+      method: "POST",
+      body: JSON.stringify({ phone: "unknown", label, session_string: txt })
+    });
+    if (res.needs_2fa) {
+      showSession2FAPrompt(res.message || "هذا الحساب محمي بكلمة مرور بخطوتين");
+      return;
+    }
+    await onAccountAdded(res);
+  } catch (e) {
+    btn.disabled = false; btn.textContent = "إضافة";
+    err.textContent = e.message; err.classList.add("show");
+  }
+}
+
+async function onAccountAdded(res) {
+  closeModal();
+  showToast("تمت إضافة الحساب: " + (res.label || res.phone), "green");
+  await refreshAccounts();
+  await renderAccounts($("mainContent"));
+}
+
+async function toggleNotify(id) {
+  try {
+    const res = await api(`/accounts/${id}/toggle-notify`, { method: "POST" });
+    showToast(res.notify_enabled ? "تم تفعيل التنبيه" : "تم إلغاء التنبيه", "green");
+    await refreshAccounts();
+  } catch (e) { showToast(e.message, "red"); }
+}
+
+async function checkAccount(id) {
+  showToast("جاري فحص الجلسة...");
+  try {
+    const res = await api(`/accounts/${id}/check`, { method: "POST" });
+    showToast(res.ok ? "الجلسة نشطة ✅" : "الجلسة تالفة ❌", res.ok ? "green" : "red");
+    await refreshAccounts();
+    await renderAccounts($("mainContent"));
+  } catch (e) { showToast(e.message, "red"); }
+}
+
+async function downloadSession(id) {
+  try {
+    const res = await fetch(API_BASE + `/accounts/${id}/download-session`, {
+      headers: { "Authorization": "Bearer " + TOKEN }
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.detail || "فشل التحميل");
+    }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `account_${id}.session`;
+    a.click(); URL.revokeObjectURL(url);
+    showToast("تم تحميل ملف الجلسة", "green");
+  } catch (e) { showToast(e.message, "red"); }
+}
+
+let holdTimer = null, holdStart = 0, currentDeleteId = null;
+
+async function startDelete(id) {
+  currentDeleteId = id;
+  try {
+    await api(`/accounts/${id}/delete/start`, { method: "POST" });
+    openModal(`
+      <h3>🗑️ حذف الحساب — الخطوة 1 من 3</h3>
+      <p>لتأكيد الحذف، اضغط الزر أدناه <b>مطولاً لمدة 3 ثوانٍ</b>.</p>
+      <button class="hold-btn" id="holdBtn">
+        <span id="holdText">🔒 اضغط مطولاً للتأكيد (3 ثوانٍ)</span>
+        <div class="progress" id="holdProg"></div>
+      </button>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="cancelDelete()">إلغاء</button>
+      </div>
+    `);
+    const btn = $("holdBtn"), prog = $("holdProg"), txt = $("holdText");
+    const start = () => {
+      holdStart = Date.now();
+      btn.classList.add("holding");
+      txt.textContent = "⏳ استمر بالضغط...";
+      holdTimer = setInterval(() => {
+        const elapsed = Date.now() - holdStart;
+        prog.style.width = Math.min(100, (elapsed / 3000) * 100) + "%";
+        if (elapsed >= 3000) {
+          clearInterval(holdTimer); holdTimer = null;
+          btn.classList.remove("holding"); txt.textContent = "✅ تم";
+          finishHold();
+        }
+      }, 50);
+    };
+    const cancel = () => {
+      if (holdTimer) { clearInterval(holdTimer); holdTimer = null; }
+      btn.classList.remove("holding"); prog.style.width = "0%";
+      txt.textContent = "🔒 اضغط مطولاً للتأكيد (3 ثوانٍ)";
+    };
+    btn.addEventListener("mousedown", start);
+    btn.addEventListener("mouseup", cancel);
+    btn.addEventListener("mouseleave", cancel);
+    btn.addEventListener("touchstart", e => { e.preventDefault(); start(); }, { passive: false });
+    btn.addEventListener("touchend", e => { e.preventDefault(); cancel(); }, { passive: false });
+  } catch (e) { showToast(e.message, "red"); }
+}
+
+async function finishHold() {
+  try {
+    const res = await api(`/accounts/${currentDeleteId}/delete/confirm-hold`, { method: "POST" });
+    openModal(`
+      <h3>🤖 الخطوة 2 من 3</h3>
+      <p>افتح البوت <b>@${escapeHtml(res.bot_username)}</b> وأرسل له النص التالي:</p>
+      <div class="phrase-box">
+        <code id="phraseText">${escapeHtml(res.bot_phrase)}</code>
+        <button onclick="copyPhrase()">📋 نسخ</button>
+      </div>
+      <p style="color:var(--yellow);font-size:13px">⏱️ لديك ${res.timeout_seconds} ثانية.</p>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="cancelDelete()">إلغاء</button>
+        <button class="btn btn-danger" onclick="finishDelete()"><span id="verifyBtnText">✅ أرسلت — تأكيد</span></button>
+      </div>
+    `);
+  } catch (e) { showToast(e.message, "red"); }
+}
+
+function copyPhrase() {
+  const t = $("phraseText").textContent.trim();
+  if (navigator.clipboard) navigator.clipboard.writeText(t).then(() => showToast("تم النسخ", "green"));
+}
+
+async function finishDelete() {
+  const btn = $("verifyBtnText");
+  btn.innerHTML = '<span class="spinner"></span> جاري...';
+  try {
+    await api(`/accounts/${currentDeleteId}/delete/verify-bot`, { method: "POST" });
+    closeModal();
+    showToast("تم حذف الحساب نهائياً", "green");
+    await refreshAccounts();
+    await renderAccounts($("mainContent"));
+  } catch (e) {
+    btn.textContent = "✅ أرسلت — تأكيد";
+    showToast(e.message, "red");
+  }
+}
+
+function cancelDelete() {
+  if (holdTimer) { clearInterval(holdTimer); holdTimer = null; }
+  closeModal(); currentDeleteId = null;
+}
+
+async function exploreAccount(id) {
+  const acc = ACCOUNTS_CACHE.find(a => a.id === id);
+  if (!acc) return;
+  openModal(`
+    <h3>🔍 ${escapeHtml(acc.label || acc.phone)}</h3>
+    <p style="margin-bottom:16px;direction:ltr;text-align:left;color:var(--muted)">${escapeHtml(acc.phone)}</p>
+    <div id="exploreBody">
+      <div style="text-align:center;padding:30px;color:var(--muted)"><span class="spinner"></span> جاري...</div>
+    </div>
+    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">إغلاق</button></div>
+  `);
+  try {
+    const dialogs = await api(`/accounts/${id}/dialogs?limit=30`);
+    const body = $("exploreBody");
+    if (!dialogs.length) { body.innerHTML = '<div class="empty"><div class="big">💬</div><h3>لا محادثات</h3></div>'; return; }
+    body.innerHTML = dialogs.map(d => {
+      const icon = d.is_user ? "👤" : d.is_group ? "👥" : "📢";
+      const init = escapeHtml((d.name || "?").slice(0, 1).toUpperCase());
+      return `<div class="dialog-item" data-acc="${id}" data-peer="${d.id}" data-name="${escapeHtml(d.name)}" data-icon="${icon}">
+          <div class="d-avatar">${init}</div>
+          <div class="d-info"><b>${icon} ${escapeHtml(d.name)}</b><small>${escapeHtml(d.last_text || "(بدون نص)")}</small></div>
+          <div class="d-meta"><small>${escapeHtml(d.date || "")}</small>${d.unread ? `<span class="pill red">${d.unread}</span>` : ""}</div>
+        </div>`;
+    }).join("");
+    body.querySelectorAll(".dialog-item").forEach(it => {
+      it.addEventListener("click", () => openDialog(parseInt(it.dataset.acc), parseInt(it.dataset.peer), it.dataset.name, it.dataset.icon));
+    });
+  } catch (e) {
+    $("exploreBody").innerHTML = `<p style="color:#fca5a5">❌ ${escapeHtml(e.message)}</p>`;
+  }
+}
+
+async function openDialog(accId, peerId, name, icon) {
+  openModal(`
+    <h3>${icon} ${escapeHtml(name)}</h3>
+    <div id="msgsBody" style="max-height:50vh;overflow-y:auto;margin-top:12px">
+      <div style="text-align:center;padding:30px;color:var(--muted)"><span class="spinner"></span> جاري...</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="exploreAccount(${accId})">🔙 رجوع</button>
+      <button class="btn btn-ghost" onclick="closeModal()">إغلاق</button>
+    </div>
+  `);
+  try {
+    const msgs = await api(`/accounts/${accId}/dialogs/${peerId}/messages?limit=30`);
+    const body = $("msgsBody");
+    if (!msgs.length) { body.innerHTML = '<div class="empty"><div class="big">💬</div><h3>لا رسائل</h3></div>'; return; }
+    body.innerHTML = msgs.map(m => {
+      const who = m.out ? "أنا" : (m.sender_name || "—");
+      const init = escapeHtml(who.slice(0, 1).toUpperCase() || "?");
+      return `<div class="msg-bubble ${m.out ? "out" : ""}">
+          <div class="m-avatar">${init}</div>
+          <div class="m-body"><div class="m-head"><b>${escapeHtml(who)}</b><small>${escapeHtml(m.date || "")}</small></div>
+          <div class="m-text">${escapeHtml(m.text || "(بدون نص)")}</div></div>
+        </div>`;
+    }).join("");
+    body.scrollTop = body.scrollHeight;
+  } catch (e) {
+    $("msgsBody").innerHTML = `<p style="color:#fca5a5">❌ ${escapeHtml(e.message)}</p>`;
+  }
+}
+
+async function renderAlerts(main) {
+  let alerts = [];
+  try { alerts = await api("/alerts?limit=100"); } catch (e) {}
+  main.innerHTML = `
+    <div class="page-head">
+      <div><h1>التنبيهات</h1><p>جميع الرسائل وأكواد التحقق الواردة</p></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-ghost" onclick="testAlertNow()">🧪 إرسال تجريبي</button>
+        ${unreadCount > 0 ? `<button class="btn btn-ghost" onclick="markAllRead()">✔️ قرأت الكل</button>` : ""}
+        ${alerts.length ? `<button class="btn btn-danger" onclick="clearAlerts()">🗑️ مسح الكل</button>` : ""}
+      </div>
+    </div>
+    ${alerts.length ? alerts.map(a => `
+      <div class="filter-row ${a.is_read ? '' : 'unread'}">
+        <div class="fl">
+          <span class="ico">${a.is_code ? "🔐" : "💬"}</span>
+          <div>
+            <b>${escapeHtml(a.sender || "—")}
+              <span class="pill ${a.is_code ? "yellow" : "blue"}">${a.is_code ? "كود" : "رسالة"}</span>
+            </b>
+            <small>${escapeHtml(a.text || "")}</small>
+          </div>
+        </div>
+        <div style="text-align:left;flex-shrink:0">
+          <small style="color:var(--muted);display:block">${escapeHtml(a.acc_label || "")}</small>
+          <small style="color:var(--muted)">${timeAgo(a.created_at)}</small>
+        </div>
+      </div>`).join("") :
+      `<div class="panel"><div class="empty"><div class="big">🔕</div><h3>لا تنبيهات</h3><p>ستظهر هنا عند وصول رسائل</p></div></div>`}
+  `;
+  if (unreadCount > 0) {
+    setTimeout(() => { markAllRead(true); }, 1500);
+  }
+}
+
+async function markAllRead(silent = false) {
+  try {
+    await api("/alerts/mark-read", { method: "POST" });
+    await refreshUnread();
+    if (!silent) {
+      showToast("تم تحديد الكل كمقروء", "green");
+      await renderAlerts($("mainContent"));
+    }
+  } catch (e) {}
+}
+
+async function testAlertNow() {
+  try {
+    await api("/alerts/test", { method: "POST", body: JSON.stringify({
+      acc_label: "حساب تجريبي", sender: "Telegram",
+      text: "كود الدخول: 54321", is_code: true
+    })});
+    showToast("تم إرسال التنبيه التجريبي", "green");
+    setTimeout(() => renderAlerts($("mainContent")), 1200);
+  } catch (e) { showToast(e.message, "red"); }
+}
+
+async function clearAlerts() {
+  if (!confirm("هل تريد مسح جميع التنبيهات؟")) return;
+  try {
+    await api("/alerts", { method: "DELETE" });
+    showToast("تم المسح", "green");
+    await refreshUnread();
+    await renderAlerts($("mainContent"));
+  } catch (e) { showToast(e.message, "red"); }
+}
+
+async function renderTargets(main) {
+  let targets = [];
+  try { targets = await api("/alert-targets"); } catch (e) {}
+  main.innerHTML = `
+    <div class="page-head">
+      <div><h1>أهداف التنبيه</h1><p>أرقام chat_id التي تستقبل إشعارات أكواد التحقق</p></div>
+      <button class="btn btn-primary" onclick="openAddTarget()">➕ إضافة هدف</button>
+    </div>
+    <div class="panel">
+      <h3>ℹ️ كيف أحصل على chat_id؟</h3>
+      <p style="color:var(--muted);font-size:14px;line-height:1.7">
+        1) أرسل رسالة للبوت <b>@THMITE33BOT</b>.<br>
+        2) استخدم @userinfobot لمعرفة chat_id الخاص بك.<br>
+        3) الصق الرقم هنا.
+      </p>
+    </div>
+    ${targets.length ? `<div class="panel">
+      <table class="table">
+        <thead><tr><th>chat_id</th><th>الاسم</th><th>أُضيف</th><th></th></tr></thead>
+        <tbody>${targets.map(t => `
+          <tr>
+            <td><b style="direction:ltr;display:inline-block">${t.tg_chat_id}</b></td>
+            <td>${escapeHtml(t.label || "—")}</td>
+            <td style="color:var(--muted);font-size:12px">${timeAgo(t.created_at)}</td>
+            <td><button class="btn btn-danger" style="padding:6px 10px;font-size:12px" onclick="deleteTarget(${t.id})">🗑️</button></td>
+          </tr>`).join("")}</tbody>
+      </table>
+    </div>` : `<div class="panel"><div class="empty"><div class="big">📮</div><h3>لا أهداف بعد</h3><p>ستصل التنبيهات لـ chat_id حسابك تلقائياً</p></div></div>`}
+  `;
+}
+
+function openAddTarget() {
+  openModal(`
+    <h3>➕ إضافة هدف تنبيه</h3>
+    <p>سيصلك إشعار اختباري فور الإضافة.</p>
+    <div class="field">
+      <label>chat_id</label>
+      <input id="tgChatId" placeholder="123456789" type="number">
+    </div>
+    <div class="field">
+      <label>اسم (اختياري)</label>
+      <input id="tgChatLabel" placeholder="مثال: حسابي الأساسي">
+    </div>
+    <div class="error" id="errTarget"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">إلغاء</button>
+      <button class="btn btn-primary" id="btnAddTgt" onclick="addTarget()">إضافة</button>
+    </div>
+  `);
+}
+
+async function addTarget() {
+  const id = parseInt($("tgChatId").value);
+  const label = ($("tgChatLabel").value || "").trim();
+  const err = $("errTarget");
+  if (!id) { err.textContent = "أدخل chat_id صحيح"; err.classList.add("show"); return; }
+  err.classList.remove("show");
+  const btn = $("btnAddTgt");
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> جاري...';
+  try {
+    await api("/alert-targets", { method: "POST", body: JSON.stringify({ tg_chat_id: id, label }) });
+    closeModal();
+    showToast("تمت الإضافة — ستستلم رسالة اختبار", "green");
+    await renderTargets($("mainContent"));
+  } catch (e) {
+    btn.disabled = false; btn.textContent = "إضافة";
+    err.textContent = e.message; err.classList.add("show");
+  }
+}
+
+async function deleteTarget(id) {
+  if (!confirm("حذف هذا الهدف؟")) return;
+  try {
+    await api(`/alert-targets/${id}`, { method: "DELETE" });
+    showToast("تم الحذف", "green");
+    await renderTargets($("mainContent"));
+  } catch (e) { showToast(e.message, "red"); }
+}
+
+async function renderLogs(main) {
+  let logs = [];
+  try { logs = await api("/logs?limit=100"); } catch (e) {}
+  main.innerHTML = `
+    <div class="page-head">
+      <div><h1>سجل العمليات</h1><p>كل ما حدث على حسابك</p></div>
+      ${logs.length ? `<button class="btn btn-danger" onclick="clearLogs()">🗑️ مسح السجل</button>` : ""}
+    </div>
+    ${logs.length ? `<div class="panel"><table class="table">
+      <thead><tr><th>الوقت</th><th>العملية</th><th>التفاصيل</th></tr></thead>
+      <tbody>${logs.map(l => `
+        <tr>
+          <td style="color:var(--muted);font-size:12px;white-space:nowrap">${timeAgo(l.created_at)}</td>
+          <td><b>${escapeHtml(l.action)}</b></td>
+          <td style="color:var(--muted)">${escapeHtml(l.details || "")}</td>
+        </tr>`).join("")}</tbody>
+    </table></div>` : `<div class="panel"><div class="empty"><div class="big">📝</div><h3>السجل فارغ</h3></div></div>`}
+  `;
+}
+
+async function clearLogs() {
+  if (!confirm("مسح جميع السجلات؟")) return;
+  try {
+    await api("/logs", { method: "DELETE" });
+    showToast("تم المسح", "green");
+    await renderLogs($("mainContent"));
+  } catch (e) { showToast(e.message, "red"); }
+}
+
+function renderSettings(main) {
+  const initial = (CURRENT_USER.tg_name || CURRENT_USER.tg_username || "?").slice(0,1).toUpperCase();
+  main.innerHTML = `
+    <div class="page-head"><div><h1>الإعدادات</h1><p>إدارة حسابك</p></div></div>
+    <div class="panel">
+      <h3>👤 الملف الشخصي</h3>
+      <div style="display:flex;align-items:center;gap:16px;padding:14px;background:var(--bg-2);border-radius:12px;border:1px solid var(--border)">
+        ${CURRENT_USER.tg_avatar
+          ? `<img src="${escapeHtml(CURRENT_USER.tg_avatar)}" style="width:64px;height:64px;border-radius:50%;object-fit:cover" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><div style="display:none;width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#7c3aed);place-items:center;font-size:24px;font-weight:700;color:#fff">${escapeHtml(initial)}</div>`
+          : `<div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#7c3aed);display:grid;place-items:center;font-size:24px;font-weight:700;color:#fff">${escapeHtml(initial)}</div>`}
+        <div>
+          <b style="font-size:16px">${escapeHtml(CURRENT_USER.tg_name || CURRENT_USER.tg_username)}</b><br>
+          <small style="color:var(--muted)">@${escapeHtml(CURRENT_USER.tg_username)}</small><br>
+          <small style="color:var(--muted)">عضو منذ ${new Date(CURRENT_USER.created_at).toLocaleDateString("ar")}</small>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>ℹ️ حول وهمياتي</h3>
+      <p style="color:var(--muted);font-size:14px;line-height:1.8">
+        وهمياتي منصة لحماية وإدارة حسابات تلغرام الوهمية.<br>
+        التحقق يتم عبر بوت تلغرام الرسمي @THMITE33BOT.
+      </p>
+    </div>
+    <div class="panel">
+      <h3 style="color:#fca5a5">⚠️ منطقة الخطر</h3>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:12px">
+        لحذف أي حساب، اذهب إلى "حساباتي" واضغط زر الحذف — يمر الحذف بـ 3 خطوات أمنية.
+      </p>
+    </div>
+  `;
+}
+
+(async function init() {
+  renderTopActions();
+  if (TOKEN) {
+    try {
+      CURRENT_USER = await api("/me");
+      renderTopActions();
+      goApp();
+      return;
+    } catch (e) {
+      TOKEN = "";
+      localStorage.removeItem("thm_token");
+    }
+  }
+  showPage("landingPage");
+})();
+</script>
+</body>
+</html>
