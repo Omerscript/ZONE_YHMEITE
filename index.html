@@ -385,9 +385,7 @@
 
 <script>
 /* =====================================================
-   API BASE — كشف تلقائي
-   - إذا فُتحت الصفحة عبر نفق ZONE Tunnel (/t/{slug}/...) → نستخدم نفس النطاق.
-   - إذا فُتحت من GitHub Pages → نستخدم رابط النفق الثابت (غيّره إن لزم).
+   API BASE — كشف تلقائي محسّن
 ===================================================== */
 const TUNNEL_BASE_URL = "https://pedigree-hankering-unmixable.ngrok-free.dev/t/cn9dlopge5";
 
@@ -399,12 +397,12 @@ const API_BASE = (function(){
   const m = path.match(/^\/t\/[^\/]+/);
   if (m) return window.location.origin + m[0];
 
-  // 2) GitHub Pages أو أي نطاق ثابت — نستخدم رابط النفق
+  // 2) GitHub Pages أو localhost — نستخدم رابط النفق
   if (host.endsWith("github.io") || host === "localhost" || host === "127.0.0.1") {
     return TUNNEL_BASE_URL;
   }
 
-  // 3) أي حالة أخرى (مثل تشغيل index.html مباشرة) — نستخدم رابط النفق
+  // 3) أي حالة أخرى — نستخدم رابط النفق
   return TUNNEL_BASE_URL;
 })();
 
@@ -416,8 +414,15 @@ let ACCOUNTS_CACHE = [];
 let alertPollTimer = null;
 let unreadCount = 0;
 
+/* =====================================================
+   ✅ api() — الإصلاح الحرج: ngrok-skip-browser-warning + قراءة text
+===================================================== */
 async function api(path, opts = {}) {
-  const headers = { "Content-Type": "application/json", ...(opts.headers || {}) };
+  const headers = {
+    "Content-Type": "application/json",
+    "ngrok-skip-browser-warning": "true",   // ← يمنع صفحة تحذير ngrok
+    ...(opts.headers || {})
+  };
   if (TOKEN) headers["Authorization"] = "Bearer " + TOKEN;
   const url = API_BASE + path;
   let res;
@@ -425,10 +430,17 @@ async function api(path, opts = {}) {
     res = await fetch(url, { ...opts, headers, mode: "cors" });
   } catch (err) {
     console.error("[fetch error]", url, err);
-    throw new Error("تعذّر الاتصال بالخادم — تحقق من الرابط");
+    throw new Error("تعذّر الاتصال بالخادم — تحقق من رابط النفق");
   }
+  // اقرأ النص أولاً للتشخيص
+  const text = await res.text();
   let data = {};
-  try { data = await res.json(); } catch (e) {}
+  try {
+    data = JSON.parse(text);
+  } catch (e) {
+    console.error("[non-JSON response]", url, res.status, text.slice(0, 500));
+    throw new Error(`الخادم أرجع رداً غير صالح (HTTP ${res.status})`);
+  }
   if (!res.ok) {
     const msg = data.detail || data.error || `خطأ ${res.status}`;
     throw new Error(msg);
@@ -1115,6 +1127,7 @@ function cancelManualStage() {
   renderAddTab();
 }
 
+/* ✅ رفع ملف الجلسة — مع ngrok header + قراءة text */
 async function uploadSessionFile() {
   const input = $("sessionFile");
   const label = ($("fileLabel").value || "").trim();
@@ -1129,10 +1142,18 @@ async function uploadSessionFile() {
     if (label) fd.append("label", label);
     const res = await fetch(API_BASE + "/accounts/upload-session", {
       method: "POST",
-      headers: { "Authorization": "Bearer " + TOKEN },
+      headers: {
+        "Authorization": "Bearer " + TOKEN,
+        "ngrok-skip-browser-warning": "true"   // ← الإصلاح
+      },
       body: fd
     });
-    const data = await res.json();
+    const txt = await res.text();
+    let data = {};
+    try { data = JSON.parse(txt); } catch(e) {
+      console.error("[upload non-JSON]", res.status, txt.slice(0, 300));
+      throw new Error(`رد غير صالح (HTTP ${res.status})`);
+    }
     if (!res.ok) throw new Error(data.detail || "فشل الرفع");
     if (data.needs_2fa) {
       showSession2FAPrompt(data.message || "هذا الحساب محمي بكلمة مرور بخطوتين");
@@ -1202,11 +1223,12 @@ async function addStringSession() {
   }
 }
 
+/* ✅ منع double-render + تحديث القائمة */
 async function onAccountAdded(res) {
   closeModal();
   showToast("تمت إضافة الحساب: " + (res.label || res.phone), "green");
   await refreshAccounts();
-  await renderAccounts($("mainContent"));
+  await navigate("accounts");   // ← بدل renderAccounts مباشرة
 }
 
 async function toggleNotify(id) {
@@ -1214,6 +1236,7 @@ async function toggleNotify(id) {
     const res = await api(`/accounts/${id}/toggle-notify`, { method: "POST" });
     showToast(res.notify_enabled ? "تم تفعيل التنبيه" : "تم إلغاء التنبيه", "green");
     await refreshAccounts();
+    await navigate("accounts");
   } catch (e) { showToast(e.message, "red"); }
 }
 
@@ -1223,14 +1246,18 @@ async function checkAccount(id) {
     const res = await api(`/accounts/${id}/check`, { method: "POST" });
     showToast(res.ok ? "الجلسة نشطة ✅" : "الجلسة تالفة ❌", res.ok ? "green" : "red");
     await refreshAccounts();
-    await renderAccounts($("mainContent"));
+    await navigate("accounts");
   } catch (e) { showToast(e.message, "red"); }
 }
 
+/* ✅ تحميل الجلسة — مع ngrok header */
 async function downloadSession(id) {
   try {
     const res = await fetch(API_BASE + `/accounts/${id}/download-session`, {
-      headers: { "Authorization": "Bearer " + TOKEN }
+      headers: {
+        "Authorization": "Bearer " + TOKEN,
+        "ngrok-skip-browser-warning": "true"   // ← الإصلاح
+      }
     });
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
@@ -1322,7 +1349,7 @@ async function finishDelete() {
     closeModal();
     showToast("تم حذف الحساب نهائياً", "green");
     await refreshAccounts();
-    await renderAccounts($("mainContent"));
+    await navigate("accounts");
   } catch (e) {
     btn.textContent = "✅ أرسلت — تأكيد";
     showToast(e.message, "red");
